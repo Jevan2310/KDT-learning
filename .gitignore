@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# 연습장 프로젝트 의존성·빌드 결과
+node_modules/
+dist/
+
+# 편집기 설정
+.vscode/
+.idea/
+
+# 비밀 정보
+.env
