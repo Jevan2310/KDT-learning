@@ -1,0 +1,14 @@
+/* 제목 꾸미기 */
+h1 {
+  color: blue;
+  font-size: 30px;
+}
+
+
+p {
+  color:gray;
+}
+
+a {
+  color: green;
+}
