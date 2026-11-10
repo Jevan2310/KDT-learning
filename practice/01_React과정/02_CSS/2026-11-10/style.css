@@ -1,0 +1,28 @@
+body {
+    background-color: #f0f0f0;
+    color: #808182;
+    font-family: sans-serif;
+    line-height: 1.6;
+}
+
+#page-title {
+    color: #7c3aed;
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+}
+p {
+    color:#475569;
+    font-size: 18px;
+}
+.highlight {
+    color: #2563eb;
+    font-weight: bold;
+}
+a{
+    background-color: green;
+    padding: 10px;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid black;
+}
