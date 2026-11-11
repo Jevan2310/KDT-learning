@@ -1,0 +1,25 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    background-color: #b4b4b4;
+}
+
+.card {
+    max-width: 520px;
+    margin: 32px auto;
+    border: 2px solid #aed2fd;
+    border-radius: 16px;
+    padding: 28px;
+    background-color: #ffffff;
+}
+.tag{
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: #bed7f7;
+    border-radius: 8px;
+    margin-right: 6px;
+}
+section {
+    margin-top: 24px;
+}

@@ -795,3 +795,67 @@ class가 나누는 것은 속성이 아니라 **요소**다 ("이 문단은 intr
 
 관련: 이 파일의 "3. CSS 문법", "4. 선택자로 적용 대상 고르기"
 </details>
+
+<details><summary>Q. 호버(hover)가 무슨 뜻이에요? <sub>2026-11-10 · 2회차 개념 정리 중</sub></summary>
+
+**A.** hover는 영어로 "위에 떠 있다"는 뜻이다. 웹에서는 **마우스 포인터를 요소 위에 올려 둔 상태**(누르지는 않음)를 말한다. CSS에서는 선택자 뒤에 `:hover`를 **붙여** 쓰면 "마우스가 올라가 있는 동안에만" 적용되는 규칙이 된다. 마우스를 치우면 원래 스타일로 돌아간다.
+
+```css
+.profile-link {
+  background-color: #2563eb;   /* 평소 */
+}
+
+.profile-link:hover {
+  background-color: #1d4ed8;   /* 마우스를 올렸을 때 — 더 진한 파랑 */
+}
+```
+
+- 클릭(누르기)과 다르다. 올려만 두면 된다.
+- 선택자 뒤의 `:`는 "어떤 **상태**일 때"라는 뜻이다. 선언의 `color: blue;`에 쓰는 `:`와는 역할이 다르다.
+- (강의 밖 내용) 휴대폰처럼 터치 화면에는 마우스가 없어서 hover 효과가 잘 보이지 않는다.
+
+관련: 이 파일의 "8. display로 표시 방식 바꾸기" → "마우스를 올렸을 때"
+</details>
+
+<details><summary>Q. box-sizing이 뭐예요? border-box로 바꾸면 왜 content 너비가 줄어들어요? <sub>2026-11-11 · 연습 중</sub></summary>
+
+**A.** `box-sizing`은 **`width`가 상자의 어디까지를 뜻하는지** 정하는 속성이다.
+- 기본값 `content-box`: `width` = **content만**. padding과 border는 그 **바깥에 더해진다** → 화면의 상자가 width보다 커진다.
+- `border-box`: `width` = **테두리까지 포함한 상자 전체**. 전체 크기를 먼저 정하고 padding과 border를 **안쪽에 넣는다** → 그만큼 content 자리가 줄어든다.
+
+```text
+width: 300px; padding: 10px; border: 2px solid;
+content-box → 상자 = 300 + 10 + 10 + 2 + 2 = 324px   (content 300px)
+border-box  → 상자 = 300px, content = 300 − 10 − 10 − 2 − 2 = 276px
+```
+
+택배 상자로 생각하면: content-box는 **물건 크기**를 정한 것이라 완충재(padding)와 상자 벽(border)이 바깥에 붙어 상자가 커진다. border-box는 **상자 바깥 크기**를 정한 것이라 벽과 완충재가 안으로 들어가고, 물건 넣을 자리가 줄어든다. 줄어든 양 = padding 양쪽 + border 양쪽.
+
+쓰는 이유: "내가 쓴 width = 화면에 보이는 상자 크기"가 되어 예측하기 쉽다. 그래서 CSS 맨 위에 `* { box-sizing: border-box; }`를 둔다.
+
+- 상자 크기에서 **너비**는 가로 길이(width) 하나다. 가로×세로는 **넓이**(면적)다.
+
+관련: 이 파일의 "6. 박스 모델", 확인 문제 "`* { box-sizing: border-box; }`를 쓰면 무엇이 달라지나?"
+</details>
+
+<details><summary>Q. 인라인 요소는 width·height가 안 먹는데, padding·margin·border는 어떻게 돼요? <sub>2026-11-11 · 연습 중</sub></summary>
+
+**A.** 인라인 요소(`a`, `span`)는 **문장의 한 줄 안에 끼어 있는 글자 조각**이다. 그래서 **좌우**로는 자리를 차지하지만, **위아래**로는 줄 간격을 밀어내지 못한다.
+
+| | 좌우 | 위아래 |
+|---|---|---|
+| `width`·`height` | 무시 | 무시 |
+| `padding` | 적용 — 옆 글자를 밀어낸다 | 배경은 커지지만 줄 간격은 그대로 → 위아래 줄과 **겹칠 수 있다** |
+| `border` | 그려지고 옆을 밀어낸다 | 그려지지만 줄을 밀어내지 않는다 → 겹칠 수 있다 |
+| `margin` | 적용 — 옆과 거리가 생긴다 | (강의 밖 내용) **무시된다** |
+
+```css
+a {
+  padding: 10px;   /* 좌우 10px은 자리를 차지, 위아래 10px은 배경만 커져서 위아래 줄과 겹침 */
+}
+```
+
+`display: inline-block`으로 바꾸면 **옆으로 나란히 놓이는 것은 그대로**이면서 위 표의 "무시·겹침"이 모두 사라진다. 작은 블록 상자처럼 width·height·padding·margin·border가 전부 자리를 차지한다. 그래서 버튼처럼 꾸민 링크나 배지(`.tag`)에 쓴다.
+
+관련: 이 파일의 "8. display로 표시 방식 바꾸기"
+</details>
