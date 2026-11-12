@@ -9,4 +9,8 @@ function ProfileCard({name, intro = "소개를 준비하고 있습니다.", goal
   );
 }
 
+export function ListTitle({count}) {
+  return <p>프로필은 총 {count}개 입니다.</p>;
+}
+
 export default ProfileCard;

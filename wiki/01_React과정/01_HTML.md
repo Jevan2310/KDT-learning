@@ -848,3 +848,15 @@ pre 태그는
 
 관련: 이 파일의 "참고 코드: 주요 태그 총정리" — 폼 예제 (`label for="username"` + `input id="username"`)
 </details>
+
+<details><summary>Q. ul 태그에는 왜 번호가 안 생겨요? <sub>2026-11-12</sub></summary>
+
+**A.** `ul`은 **u**nordered **l**ist(순서 없는 목록)라서 기본 표시가 점(•)이다. 번호는 **o**rdered **l**ist인 `ol`에서 붙는다. 순서가 의미 있으면 `ol`, 아니면 `ul`을 쓴다. 모양만 바꾸고 싶으면 CSS `list-style-type`(예: `decimal`, `none`)을 쓴다.
+
+```html
+<ul><li>사과</li></ul>  <!-- • 사과 -->
+<ol><li>사과</li></ol>  <!-- 1. 사과 -->
+```
+
+관련: 이 파일의 목록 태그 표 (`ul` / `ol`)
+</details>
