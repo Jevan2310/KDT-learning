@@ -228,6 +228,9 @@ Claude는 튜터로 행동한다. 상위 `../CLAUDE.md`(wiki, 질문 노트, 실
 |---|---|
 | HTML·CSS·JavaScript (01~03회차) | 연습 폴더에 `index.html`(+ `style.css`, `script.js`)을 만들고 `open index.html`로 브라우저에서 연다 |
 | React (04회차~) | `practice/01_React과정/_react연습장/` Vite 프로젝트 하나를 계속 쓴다. 처음 필요할 때 사용자와 함께 만든다 (wiki 04_React시작 방식). 문제는 `src/` 안에서 풀고, 채점 뒤 Claude가 푼 파일을 그날 연습 폴더에 복사해 기록으로 남긴다 |
-| (새 과정) | 과정이 시작되면 여기에 한 줄 추가한다 (예: Java — `_java연습장/` IntelliJ 프로젝트) |
+| Node (02_Node과정) | `practice/02_Node과정/_node연습장/` npm 프로젝트 하나를 계속 쓴다 (`npm init -y` 후 필요한 패키지 설치: `readline-sync`, `express`, `cors`). 01~02회차는 `node 파일.js`로 실행해 VS Code 터미널에서 입출력을 본다. 03회차부터는 `node server.js`로 서버(3000)를 띄우고 브라우저에서 `http://localhost:3000/경로`로 확인한다. 코드를 고치면 `Ctrl + C`로 끄고 다시 실행한다. 04회차는 `_react연습장`도 `npm run dev`로 함께 켠다 (터미널 2개) |
+| Spring (03_Spring과정) | IntelliJ IDEA + JDK 21. 01회차(Java 기초)는 일반 Java 프로젝트 `practice/03_Spring과정/_java연습장/`에서 main ▶로 실행해 콘솔을 본다. 02회차부터는 start.spring.io(Gradle, Java 21, Spring Web + Thymeleaf)로 만든 `practice/03_Spring과정/_spring연습장/` 하나를 계속 쓴다. `*Application`의 main ▶로 서버를 띄우고 `http://localhost:8080/경로`로 확인한다. 코드를 고치면 서버를 재시작한다 (중지 ■) |
+| (새 과정) | 과정이 시작되면 여기에 한 줄 추가한다 |
 
-- `node_modules`는 연습장 프로젝트에만 둔다. 날짜 폴더에는 만들지 않는다.
+- `node_modules`(와 Spring의 `build/`, `.gradle/`)는 연습장 프로젝트에만 둔다. 날짜 폴더에는 만들지 않는다.
+- 연습장은 처음 필요할 때 사용자와 함께 만든다. 문제를 낼 때 "시작하기"(연습장 위치, 실행 명령, 고칠 파일)를, 채점이 끝날 때 "푼 파일 사본 위치·연습장 상태·서버 끄기"를 안내한다.

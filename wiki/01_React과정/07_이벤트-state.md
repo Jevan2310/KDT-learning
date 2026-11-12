@@ -1,6 +1,6 @@
 # 07. 이벤트와 state — 사용자 동작에 따라 화면 바꾸기
 
-> 과정: React과정 · [노션 원문](https://app.notion.com/p/40c848f71c9b809e8f29ef3f0f23cf7d) · 최종 갱신일: 2026-11-09
+> 과정: React과정 · [노션 원문](https://app.notion.com/p/40c848f71c9b809e8f29ef3f0f23cf7d) · 최종 갱신일: 2026-11-12
 
 ## 한눈에 보기
 - React에서는 JSX의 `onClick`에 **실행할 함수를 전달**해 클릭을 처리한다 (`onClick={handleCheer}`, 호출 `()` 없이).
@@ -257,6 +257,56 @@ const visibleProfiles = showLearningOnly
 7. `CheerCounter`를 두 번 써서 state가 독립적인지 확인한 뒤 하나만 남김.
 8. `App`에 `showLearningOnly` state와 필터 버튼을 추가하고, 개수·빈 목록·카드 목록을 모두 `visibleProfiles`로 표시.
 
+수업 중 클릭 확인 예제 (1장, `src/components/CheerCounter.jsx`):
+
+```jsx
+// 컴포넌트
+const CheerCounter = () => {
+
+    // 함수
+    const handleCheer = () => {
+        console.log('응원 버튼을 눌렀습니다.');
+    }
+
+    ;
+
+    return (
+        <section>
+            <h2>응원하기</h2>
+
+            <button type='button' onClick={handleCheer}>
+                응원 보내기
+            </button>
+        </section>
+    )
+}
+
+export default CheerCounter;
+```
+
+`App.jsx`에서 가져와 표시한다.
+
+```jsx
+import './App.css'
+import CheerCounter from './components/CheerCounter.jsx'
+
+const App = () => {
+
+  return (
+    <main>
+      <CheerCounter />
+    </main>
+  )
+}
+
+export default App
+
+```
+
+- 컴포넌트와 이벤트 핸들러를 모두 화살표 함수로 만들었다 (`const handleCheer = () => { ... }`). `function handleCheer() { ... }`와 마찬가지로 `onClick={handleCheer}`로 전달한다.
+
+> 💡 보충: 핸들러 아래 혼자 있는 `;`는 아무 일도 하지 않는 빈 문장이라 실행에 영향이 없다.
+
 수업 중 증가/감소 버튼 예제:
 
 ```jsx
@@ -289,6 +339,28 @@ const App = () => {
 
 export default App
 ```
+
+수업 중 소개 토글 연결 예제 (6장, `App.jsx`):
+
+```jsx
+import { useState } from 'react';
+import './App.css'
+import IntroToggle from './components/IntroToggle';
+
+
+const App = () => {
+  return (
+    <main>
+      <IntroToggle />
+    </main>
+  )
+}
+
+export default App
+
+```
+
+> 💡 보충: `'./components/IntroToggle'`처럼 `.jsx` 확장자를 빼도 Vite가 파일을 찾아준다. 이 코드의 `useState`는 가져오기만 하고 쓰지 않았다(실행에는 영향 없음).
 
 ### 최종 코드
 `ProfileCard.jsx`는 [06_목록-조건부렌더링](06_목록-조건부렌더링.md)의 최종 코드를 그대로 쓴다.
@@ -535,12 +607,11 @@ button:focus-visible {
 
 | 증상 | 확인할 내용 |
 |---|---|
-| 클릭 전에 함수가 실행됨 | `onClick={함수()}`로 작성했는지 |
+| 클릭 전에 함수가 실행됨 | `onClick={함수명()}`로 작성했는지 |
 | 숫자가 콘솔에서만 바뀜 | 일반 변수만 변경하고 있는지 |
 | 상태 변경 시 오류 | 상태 변수에 직접 대입했는지 |
 | `useState`를 찾지 못함 | React에서 import했는지 |
 | 렌더링이 계속 반복됨 | 컴포넌트 본문에서 상태 변경 함수를 무조건 호출했는지 |
-| 여러 번 증가시켜도 한 번만 증가 | 같은 상태 스냅샷으로 값을 계산했는지 |
 | 필터 개수와 목록이 다름 | 둘 다 `visibleProfiles`를 사용하는지 |
 
 ## 빠른 참고 (치트시트)

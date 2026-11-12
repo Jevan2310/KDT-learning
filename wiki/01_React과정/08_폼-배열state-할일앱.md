@@ -1,6 +1,6 @@
-# 08. 입력 폼과 배열 state — 할 일 앱 만들기
+# 08. 입력 폼과 배열 state — 할 일(Todolist) 앱 만들기
 
-> 과정: React과정 · [노션 원문](https://app.notion.com/p/40c848f71c9b802aadcddc08d32b9463) · 최종 갱신일: 2026-11-09
+> 과정: React과정 · [노션 원문](https://app.notion.com/p/40c848f71c9b802aadcddc08d32b9463) · 최종 갱신일: 2026-11-12
 
 ## 한눈에 보기
 - 지금까지 배운 목록([06](06_목록-조건부렌더링.md))·이벤트와 state([07](07_이벤트-state.md))를 연결해 **학습 할 일 목록** 앱을 만들었다.
@@ -85,6 +85,35 @@ JSX에서는 HTML의 `for` 대신 **`htmlFor`**를 쓴다 (HTML의 `label for`�
 ### 4. `form` 제출과 `preventDefault()`
 `form`은 입력 내용을 제출하는 단위다. 버튼 클릭뿐 아니라 입력창에서 Enter로도 제출된다.
 
+강의는 먼저 HTML만으로 만든 폼을 보여줬다 ([01_HTML](01_HTML.md)의 폼).
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- post: 입력한 값을 숨겨서 가져 감 -->
+    <!-- get: url에 입력한 값을 변수처럼 갖고 감 -->
+    <form method="get" action="aaa.html">
+        아이디 <input type="text" name="userId">
+        패스워드 <input type="password" name="userPw">
+        <button type="submit">로그인</button>
+    </form>
+</body>
+</html>
+```
+
+| `method` | 입력값을 보내는 방식 |
+|---|---|
+| `get` | URL에 입력한 값을 변수처럼 붙여서 가져감 |
+| `post` | 입력한 값을 숨겨서 가져감 |
+
+> 💡 보충: `action`은 제출할 때 이동할 주소, `name`은 보내는 값의 이름이다. 위 폼은 제출하면 `aaa.html?userId=…&userPw=…` 주소로 **페이지가 이동**한다. React에서는 이 기본 동작을 아래처럼 `preventDefault()`로 막는다.
+
 ```jsx
 function handleSubmit(event) {
   event.preventDefault();
@@ -120,9 +149,18 @@ setTasks((prevTasks) => [...prevTasks, newTask]);
 ```
 
 ```javascript
-const previous = ["HTML", "CSS"];
+const previous = ["HTML" , "CSS"];
 const next = [...previous, "React"];
-// ["HTML", "CSS", "React"]
+
+console.log("추가 전:", previous);
+console.log("추가 후:", next);
+```
+
+결과:
+
+```text
+추가 전: ["HTML", "CSS"]
+추가 후: ["HTML", "CSS", "React"]
 ```
 
 `...previous`는 기존 배열의 항목들을 새 배열 안에 펼친다.
@@ -133,6 +171,7 @@ const next = [...previous, "React"];
 function handleSubmit(event) {
   event.preventDefault();
 
+  // 양쪽 공백 제거
   const trimmedTitle = title.trim();
 
   if (trimmedTitle === "") {
@@ -291,7 +330,225 @@ import TaskApp from "./components/TaskApp.jsx";
 7. `handleToggle`: `map()` + 객체 펼침으로 완료 전환, 체크박스 `checked` 연결, 완료 항목에 `completed` 클래스.
 8. `remainingCount` 계산, 빈 목록 안내, 모두 완료 안내 추가.
 
+### 수업 중 강사 화면 코드
+
+강사 화면에서는 `TaskApp`을 화살표 함수로 만들고 `export const TaskApp`으로 내보냈다.
+
+<details><summary>입력 미리보기와 alert 버튼 (3장)</summary>
+
+```jsx
+import { useState } from "react"
+
+export const TaskApp = () => {
+    const [title, setTitle] = useState("")
+
+    const message = () => {
+        alert(`입력한 값은 : '${title}' 입니다.`);
+        setTitle("");
+    }
+
+    return (
+        <section className="task-app">
+            <h2>한코딩의 학습 할 일 목록</h2>
+
+            <label htmlFor='task-title'>새로운 할 일</label>
+
+            <input
+                id='task-title'
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="예: React 복습하기"
+            />
+            <p>작성중 : {title}</p>
+            <button onClick={message}>추가</button>
+        </section>
+    )
+}
+```
+
+- `<p>작성중 : {title}</p>`로 입력하는 글자가 바로 화면에 보이는지 확인했다.
+- `form` 없이 버튼 `onClick`으로 입력값을 `alert`에 보여주고 `setTitle("")`로 입력창을 비웠다. `form` 제출은 4장에서 바꾼다.
+
+> 💡 보충: `export const TaskApp`은 이름을 붙여 내보내는 방식이라 `import { TaskApp } from "./components/TaskApp.jsx";`로 가져와야 한다. 중괄호 없는 `import TaskApp from ...`은 최종 코드처럼 `export default TaskApp;`이 있을 때만 된다 ([06](06_목록-조건부렌더링.md)의 강사 화면 코드 참고).
+</details>
+
+<details><summary>제출 함수 다듬기 — 새 배열로 추가 (6장)</summary>
+
+```jsx
+import { useState } from "react"
+
+export const TaskApp = () => {
+    // 입력 창
+    const [title, setTitle] = useState("");
+
+    // 리스트
+    const [tasks, setTasks] = useState([
+        {
+            id: "task-1",
+            title: "HTML 복습하기",
+            completed: true
+        },
+        {
+            id: "task-2",
+            title: "React 입력 폼 만들기",
+            completed: false
+        }
+    ]);
+
+
+    const handleSubmit = (event) => {
+        // 새로고침 방지
+        event.preventDefault();
+
+        setTasks([...tasks, {id:"3", title:title, completed:false}]);
+        setTitle("");
+    }
+
+    return (
+        <section className="task-app">
+            <h2>한코딩의 학습 할 일 목록</h2>
+
+            <form onSubmit={handleSubmit}>
+                <label htmlFor='task-title'>새로운 할 일</label>
+
+                <input
+                    id='task-title'
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="예: React 복습하기"
+                />
+                <p>작성중 : {title}</p>
+                <button type="submit">추가</button>
+            </form>
+            <ul className="task-list">
+                {tasks.map((task) => (
+                    <li key={task.id}>{task.title}</li>
+                ))}
+            </ul>
+        </section>
+    )
+}
+```
+
+> 💡 보충: 새 항목의 `id`가 항상 `"3"`이라 두 번째로 추가한 항목부터 ID가 겹친다. Console에 같은 `key` 경고가 뜨고, 나중에 삭제·완료 전환을 붙이면 같은 ID 항목이 함께 바뀐다(오류 표의 "같은 항목이 여러 개 함께 변경됨"). 다음 단계처럼 항목마다 다른 ID를 만든다.
+</details>
+
+<details><summary>count state로 ID 만들기 · 삭제 버튼 (7장)</summary>
+
+```jsx
+import { useState } from "react"
+
+export const TaskApp = () => {
+
+
+    // 입력 창
+    const [title, setTitle] = useState("");
+
+    // 리스트
+    const [tasks, setTasks] = useState([
+        {
+            id: 1,
+            title: "HTML 복습하기",
+            completed: true
+        },
+        {
+            id: 2,
+            title: "React 입력 폼 만들기",
+            completed: false
+        }
+    ]);
+
+
+    const [count, setCount] = useState(3);
+
+    const handleSubmit = (event) => {
+        // 새로고침 방지
+        event.preventDefault();
+
+        // 입력한 일정 제목에서 양쪽 공백을 제거
+        const trimmedTitle = title.trim();
+
+        if (trimmedTitle === '') {
+            return;
+        }
+
+        const newTask = {
+            id: count,
+            title: trimmedTitle,
+            completed: false
+        }
+
+        setCount(count + 1);
+        setTasks([...tasks, newTask]);
+        setTitle("");
+    }
+
+    function handleDelete(taskId) {
+        setTasks((p) => p.filter((t) => t.id !== taskId))
+    }
+
+    return (
+        <section className="task-app">
+            <h2>한코딩의 학습 할 일 목록</h2>
+
+            <form onSubmit={handleSubmit}>
+                <label htmlFor='task-title'>새로운 할 일</label>
+
+                <input
+                    id='task-title'
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="예: React 복습하기"
+                />
+                <p>작성중 : {title}</p>
+                <button type="submit">추가</button>
+            </form>
+            <ul className="task-list">
+                {tasks.map((task) => (
+                    <li key={task.id}>
+                        <span>{task.title}</span>
+                        <button type="button" onClick={() => handleDelete(task.id)}>삭제</button>
+
+                    </li>
+
+                ))}
+            </ul>
+        </section>
+    )
+}
+```
+
+- `crypto.randomUUID()` 대신 `count` state(초기값 `3`)를 새 ID로 쓰고, 추가할 때마다 `setCount(count + 1)`로 1씩 늘렸다. 초기 데이터 ID도 숫자 `1`, `2`다.
+- `handleDelete`의 `(p) => p.filter((t) => t.id !== taskId)`는 매개변수 이름만 짧게 쓴 것으로, 최종 코드의 `handleDelete`와 같은 동작이다.
+</details>
+
 ### 최종 코드
+
+강의 종합 실습의 `src/App.jsx` (강사 화면: `TaskApp`만 표시)
+
+```jsx
+import { useState } from 'react'
+import './App.css'
+import TaskApp from './components/TaskApp'
+
+const App = () => {
+
+  return (
+    <>
+      <TaskApp />
+    </>
+  )
+}
+
+export default App
+```
+
+- 프로필 예제를 유지하려면 위 "만든 것"처럼 기존 `<main>` 안에 `<TaskApp />`만 추가한다.
+
+> 💡 보충: `<>...</>`는 Fragment다([04_React시작](04_React시작.md)). 이 `App.jsx`는 중괄호 없이 가져오므로 `TaskApp.jsx`에 `export default TaskApp;`이 있어야 한다(아래 코드). 강사 화면처럼 `export const TaskApp`만 있으면 가져오지 못한다. `useState`는 가져오기만 하고 쓰지 않았다.
 
 `src/components/TaskApp.jsx`
 
@@ -585,6 +842,11 @@ export default TaskApp;
 <details><summary>Q. 폼 제출 함수에서 <code>event.preventDefault()</code>가 왜 필요한가요?</summary>
 
 브라우저의 폼 제출에는 페이지 이동 등 기본 동작이 있어서, 그대로 두면 제출할 때 새로고침된다. 이 기본 동작을 막고 JavaScript로 제출 내용을 처리하기 위해 쓴다.
+</details>
+
+<details><summary>Q. HTML 폼의 <code>method="get"</code>과 <code>method="post"</code>는 어떻게 다른가요?</summary>
+
+`get`은 입력한 값을 URL에 변수처럼 붙여서 보내고, `post`는 입력한 값을 숨겨서 보낸다. 둘 다 제출하면 `action`의 주소로 페이지가 이동한다. React 폼에서는 이 이동을 `preventDefault()`로 막는다.
 </details>
 
 <details><summary>Q. 폼 안의 버튼에 <code>type</code>을 명시하는 이유와 <code>submit</code>/<code>button</code>의 차이는?</summary>

@@ -9,8 +9,10 @@ KDT 수업 복습 및 학습용 저장소.
 ├── 강의목록.md      전체 강의 색인 (강의 순서 = 연습 순서)
 ├── 실력점검.md      항목별 수준(0~4), 복습 대기열, 점검 이력
 ├── wiki/            강의 정리본
-│   ├── 00_개발환경/  VS Code·Node.js, IntelliJ·JDK, git
-│   └── 01_React과정/ HTML → CSS → JavaScript → React
+│   ├── 00_개발환경/  VS Code·Node.js, IntelliJ·JDK·단축키, git
+│   ├── 01_React과정/ HTML → CSS → JavaScript → React
+│   ├── 02_Node과정/  백엔드·Node.js → Express 서버 → React와 연결
+│   └── 03_Spring과정/ Java 기초 → Spring Boot → Thymeleaf → 폼
 ├── practice/        연습 기록 (과정/회차/날짜별 답안·코드·채점)
 └── scripts/         노션 강의 페이지를 받아오는 스크립트
 ```
@@ -30,6 +32,8 @@ KDT 수업 복습 및 학습용 저장소.
 | 과정 | 내용 | 정리 |
 |---|---|---|
 | 01. React 과정 | 직접 사용하는 첫 웹 앱 만들기 (HTML · CSS · JavaScript · React) | 01~08회차 |
+| 02. Node 과정 | 백엔드 이해하고 React와 연결하기 (Node.js · Express · fetch) | 01~04회차 |
+| 03. Spring 과정 | Java Spring 학생 목록 API 만들기 (Java · Spring Boot · Thymeleaf) | 01~04회차 (05~07 예정) |
 
 ## 출처
 
