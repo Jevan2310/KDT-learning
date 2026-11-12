@@ -1072,4 +1072,13 @@ React가 관리하는 화면을 직접 수정하면 **React의 화면 관리와 
 
 ## 질문 노트
 
-_아직 없음_
+<details><summary>Q. React 연습장 index.html을 브라우저로 바로 열면 왜 화면이 비어 있어요? <sub>2026-11-12 · 연습 중</sub></summary>
+
+**A.** React 프로젝트의 `index.html`에는 빈 `<div id="root"></div>`만 있다. 내용은 `/src/main.jsx`가 채운다. 그런데 브라우저는 JSX를 직접 읽지 못한다. 그래서 Vite 개발 서버가 JSX를 브라우저용 JavaScript로 바꿔서 보내 줘야 한다. 파일을 더블클릭해서 열면(`file://...`) 이 과정이 없어서 `root`가 빈 채로 남는다.
+
+- 확인 방법: 주소창이 `file:///...index.html`이면 잘못 연 것이고, `http://localhost:5173/`이면 맞게 연 것이다.
+- 여는 방법: 연습장 폴더에서 `npm run dev`를 실행하고, 터미널에 나온 주소를 연다.
+- HTML·CSS·JS 연습(01~03회차)은 `index.html`을 바로 열어도 됐지만, React(04회차~)는 서버로 열어야 한다.
+
+관련: 이 파일의 개발 서버 실행 부분 (`npm run dev`)
+</details>
