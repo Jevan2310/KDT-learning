@@ -755,4 +755,25 @@ props는 **읽기 전용**이다. 부모가 전달한 값을 읽는 데만 쓴�
 
 ## 질문 노트
 
-_아직 없음_
+<details><summary>Q. <code>&lt;ProfileCard name="한코딩" goalCount=3 /&gt;</code>처럼 변수·중괄호 없이 바로 써도 되나요? <sub>2026-11-12</sub></summary>
+
+**A.** `name="한코딩"`은 된다 (문자열은 따옴표로 바로 전달 가능). `goalCount=3`은 **문법 오류** — JSX 속성값은 `"문자열"` 또는 `{자바스크립트 값}` 둘 중 하나만 쓸 수 있다. 숫자는 `goalCount={3}`으로 쓴다. `goalCount="3"`은 오류는 안 나지만 숫자가 아닌 문자열 `"3"`이 전달된다.
+
+```jsx
+<ProfileCard name="한코딩" goalCount={3} />
+```
+
+관련: props 전달 섹션
+</details>
+
+<details><summary>Q. 구조 분해 할당은 왜 해요? <code>props.name</code>, <code>props.intro</code> 그대로 써도 되지 않아요? <sub>2026-11-12</sub></summary>
+
+**A.** 그대로 써도 된다. 두 방식은 같은 props를 읽고 화면도 같다. 구조 분해는 **필수가 아니라 편의 문법**이다. 그래도 쓰는 이유는 세 가지다.
+- **짧다**: props가 많고 여러 번 쓰면 `props.`가 계속 붙는다 → `{name}`, `{intro}`로 줄어든다.
+- **첫 줄에서 보인다**: `function ProfileCard({ name, intro, imageUrl })`만 보면 이 컴포넌트가 어떤 props를 받는지 본문을 안 읽어도 안다.
+- **기본값을 붙이기 쉽다**: 강의에서 배운 기본값(`intro = "소개를 준비하고 있습니다."`)은 구조 분해 자리에 쓴다.
+
+React 코드에서는 구조 분해가 더 흔하다. props가 한두 개뿐이면 `props.name`도 괜찮다.
+
+관련: 이 파일의 "6. 구조 분해 할당", "8. props 기본값"
+</details>
