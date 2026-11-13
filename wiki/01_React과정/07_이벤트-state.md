@@ -707,4 +707,9 @@ props는 부모가 전달하는 정보로 자식이 직접 바꾸지 않는다(�
 
 ## 질문 노트
 
-_아직 없음_
+<details><summary>Q. 컴포넌트를 파일로 나눴더니 <code>useState is not defined</code> 오류가 나요 <sub>2026-11-13 · 연습 중</sub></summary>
+
+**A.** `useState`를 쓰는 **파일마다** 맨 위에 `import { useState } from "react";`가 있어야 한다. 한 파일에 있던 코드를 여러 파일로 나눌 때 import 줄이 따라가지 않으면, 그 파일은 `useState`가 어디서 왔는지 몰라 화면이 하얘진다. 다른 파일이 가져온 것은 쓸 수 없다 (파이썬도 모듈마다 `import`를 따로 쓰는 것과 같다). `npx eslint src`를 돌리면 `'useState' is not defined`로 알려 준다.
+
+관련: 이 파일의 "3. `useState`", [06_목록-조건부렌더링](06_목록-조건부렌더링.md)의 이름 붙인 export
+</details>
