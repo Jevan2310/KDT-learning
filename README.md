@@ -1,4 +1,4 @@
-# KDT_learning
+# KDT-learning
 
 KDT 수업 복습 및 학습용 저장소.
 수업 내용을 정리하고(**wiki**), 정리한 내용으로 연습하고(**practice**), 실력을 점검한다(**실력점검.md**).
