@@ -1,21 +1,26 @@
 import BookCard from "./BookCard";
 
-const books =[
-    {id:1, title: "모던 자바스크립트", writer:"홍길동", pages:250},
-    {id:2, title: "포스트 자바스크립트", writer:"김자바", pages:150},
-    {id:3, title: "퓨처 자바스크립트", writer:"한코딩", pages:180},
-    
+const books = [
+    {id:1, title: "홍길동전", author: "신원미상", pages: 385},
+    {id:2, title: "장금이", author: "개똥이", pages: 225},
+    {id:3, title: "콩쥐팥쥐", author: "신원미상", pages: 35},
 ]
 
-const BookList = () =>{
-    const bookCards = books.map((book)=>{
-        return <BookCard key={book.id} id={book.id} title={book.title} 
-        writer={book.writer} pages={book.pages}/>
-    })
-    return <section>
+const BookList = () => {
+    const bookCard = books.map((book)=>{
+            return <BookCard key={book.id} 
+            id={book.id} 
+            title={book.title} 
+            author={book.author}
+            pages={book.pages}
+            />
+        })
+    return (
+        <section>
             <h2>읽을 책</h2>
-            {bookCards}
+            {bookCard}
         </section>
+    )
 }
 
-export default BookList; 
+export default BookList;
