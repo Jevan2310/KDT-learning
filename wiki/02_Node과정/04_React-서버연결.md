@@ -551,6 +551,8 @@ export default StudentList;
 
 `App.jsx`는 실습 2와 같다 (`<main>` 안에 `<StudentList />`).
 
+> 💡 보충: 같은 `StudentList.jsx`를 Spring API(`http://localhost:8080/api/students`, `@CrossOrigin`)에 연결하는 것은 [Spring 06_JSON-API-React연결](../03_Spring과정/06_JSON-API-React연결.md)에 있다.
+
 ### 실습 5. 정상·실패·빈 목록·로딩 확인하기
 
 | 확인 | 방법 | 기대 결과 |
@@ -713,4 +715,24 @@ Request URL(`http://localhost:3000/students`), Request Method(`GET`), Status Cod
 
 ## 질문 노트
 
-_아직 없음_
+<details><summary>Q. 서버·CORS 설정이 맞는데 React 화면이 안 떠요. 무엇을 봐야 해요? <sub>2026-11-19 · 개념 정리 예시 따라 하던 중</sub></summary>
+
+**A.** 파일 이름과 import 경로가 글자 하나까지 같은지 본다. 컴포넌트 파일을 `StudentsList.jsx`(s가 하나 더)로 만들고 `App.jsx`에서는 `./components/StudentList`로 가져오면 Vite가 파일을 못 찾아 브라우저에 빨간 오류 화면을 띄운다.
+
+```text
+Failed to resolve import "./components/StudentList" from "src/App.jsx". Does the file exist?
+```
+
+파일 이름을 import와 같게 바꾸면 된다 (VS Code 파일 목록에서 `Enter` 또는 우클릭 → Rename). 서버 쪽 문제(CORS·꺼짐)와는 오류 모양이 다르다. 그런 문제는 화면은 뜨고 버튼을 누를 때 Console에 오류가 나온다.
+
+관련: 이 파일의 "실습 2. 버튼으로 요청해 보기"
+</details>
+
+<details><summary>Q. Console에 `content.js`, `chrome-extension://` 오류가 잔뜩 떠요. 내 코드 문제예요? <sub>2026-11-19 · 개념 정리 예시 따라 하던 중</sub></summary>
+
+**A.** (강의 밖 내용) 아니다. 크롬에 설치된 **확장 프로그램**이 페이지마다 끼워 넣는 코드가 낸 오류다. 각 줄 오른쪽의 출처를 보고 구별한다. `content.js`, `chrome-extension://…`, 처음 보는 외부 주소는 확장 프로그램이 낸 것이다. `StudentList.jsx:9`, `localhost:3000`처럼 내 파일이나 내 서버가 보이면 내 코드다.
+
+화면 테스트는 **시크릿 창**(`Cmd + Shift + N`)에서 하면 확장 프로그램이 기본으로 꺼져 있어 내 코드 메시지만 남는다. 지금 창에서 하려면 Console의 ⊘(Clear console)로 지우고 다시 실행한다.
+
+관련: 이 파일의 "11. Network 탭에서 요청 확인하기"
+</details>
