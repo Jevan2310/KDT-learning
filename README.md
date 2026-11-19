@@ -9,10 +9,11 @@ KDT 수업 복습 및 학습용 저장소.
 ├── 강의목록.md      전체 강의 색인 (강의 순서 = 연습 순서)
 ├── 실력점검.md      항목별 수준(0~4), 복습 대기열, 점검 이력
 ├── wiki/            강의 정리본
-│   ├── 00_개발환경/  VS Code·Node.js, IntelliJ·JDK·단축키, git, MySQL·DBeaver
+│   ├── _풀스택과정소개.md  과정 구조·수업 방식·과정 흐름·만들 수 있는 결과물
+│   ├── 00_개발환경/  VS Code·Node.js, IntelliJ·JDK·단축키, git, GitHub·블로그 기록, MySQL·DBeaver
 │   ├── 01_React과정/ HTML → CSS → JavaScript → React
 │   ├── 02_Node과정/  백엔드·Node.js → Express 서버 → React와 연결
-│   ├── 03_Spring과정/ Java 기초 → Spring Boot → Thymeleaf → 폼
+│   ├── 03_Spring과정/ Java 기초 → Spring Boot → Thymeleaf → 폼 → H2·JPA 저장 → JSON API·React 연결
 │   ├── 04_SEO과정/    검색엔진 이해 → 검색 친화 페이지 → 사이트 등록 → 사이트맵
 │   ├── 05_비동기과정/  실행 순서 → Promise·async/await → 블로킹·논블로킹 → 느린 API 화면
 │   └── 06_데이터베이스과정/ SQL 기초 → 조회 → 수정·삭제·트랜잭션 → JOIN → Spring + MyBatis

@@ -484,7 +484,7 @@ const students = await response.json();
 - `response.json()`은 `response`가 있어야 실행할 수 있다 → **앞 결과가 필요한 관계**라 차례로 기다린다.
 - `fetch()`는 `404`, `500` 같은 HTTP 상태만으로 **자동 거부되지 않으므로** `response.ok` 검사로 실패를 처리한다.
 
-> 💡 보충: `8080/api/students`는 Spring Boot 서버의 학생 API 주소다. Node과정에서는 같은 흐름을 `http://localhost:3000/students`로 썼다.
+> 💡 보충: `8080/api/students`는 Spring Boot 서버의 학생 API 주소다 ([Spring 06](../03_Spring과정/06_JSON-API-React연결.md)). Node과정에서는 같은 흐름을 `http://localhost:3000/students`로 썼다.
 
 ### 13. `Promise`와 `await`의 역할 구분
 

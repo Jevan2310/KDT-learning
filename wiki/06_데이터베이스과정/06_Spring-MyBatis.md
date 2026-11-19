@@ -4,7 +4,7 @@
 
 ## 한눈에 보기
 - 지금까지 DBeaver에서 직접 실행한 SQL을 **백엔드가 요청을 받을 때 실행**하도록 만든다: 요청 → Spring → SQL 실행 → DB 조회 → JSON 응답.
-- **MyBatis** = 개발자가 **직접 쓴 SQL**을 실행하고, 전달할 값과 조회 결과를 Java 코드에 연결하는 도구 (JPA는 기본 CRUD SQL을 직접 쓰지 않아도 됨).
+- **MyBatis** = 개발자가 **직접 쓴 SQL**을 실행하고, 전달할 값과 조회 결과를 Java 코드에 연결하는 도구 (JPA는 기본 CRUD SQL을 직접 쓰지 않아도 됨 → [Spring 05](../03_Spring과정/05_H2-JPA저장.md)).
 - **Mapper** = `StudentMapper.java`(호출할 메서드, `@Mapper`) + `StudentMapper.xml`(실행할 SQL). XML의 **`namespace` = 인터페이스 전체 이름**, SQL의 **`id` = 메서드 이름**으로 연결된다. `resultType`에는 **한 행**을 담을 타입(`Student`)을 쓴다.
 - 값은 **`#{...}`** 로 바인딩한다 (문자열도 따옴표 없이). `map-underscore-to-camel-case=true`로 `registered_date` ↔ `registeredDate`가 연결된다. `useGeneratedKeys`로 새 `id`를 객체에 받는다.
 - `@RestController`에서 Mapper를 **생성자로 받아** 호출하고, 학생 CRUD API(`GET`/`POST`/`PUT`/`DELETE /students`)를 만들었다. 비밀번호는 `application.properties`에 쓰지 않고 **환경변수 `${DB_PASSWORD}`** 로 읽는다.
@@ -49,6 +49,8 @@ JSON으로 응답
 | JPA | **객체 중심**으로 데이터를 다루며, 기본 CRUD SQL을 직접 쓰지 않아도 됨 |
 | MyBatis | **SQL을 직접 작성**하고 Java 메서드와 연결 |
 
+> 💡 보충: JPA 방식(Entity·JpaRepository의 `save()`·`findAll()`)은 [Spring 05_H2-JPA저장](../03_Spring과정/05_H2-JPA저장.md)에서 만들었다.
+
 ```java
 studentMapper.findAll();
 ```
@@ -77,7 +79,7 @@ XML에서 id가 findAll인 SQL 실행
 ```
 
 ### 4. 실습 프로젝트 준비
-기존 JPA 예제와 설정이 섞이지 않도록 **별도의 Spring Boot 프로젝트**를 만든다. DB는 앞에서 만든 `school`을 그대로 쓴다.
+기존 JPA 예제([Spring 05](../03_Spring과정/05_H2-JPA저장.md))와 설정이 섞이지 않도록 **별도의 Spring Boot 프로젝트**를 만든다. DB는 앞에서 만든 `school`을 그대로 쓴다.
 
 | 항목 | 설정 |
 |---|---|
