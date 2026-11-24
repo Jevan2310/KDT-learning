@@ -921,4 +921,16 @@ PUT·DELETE 성공 응답은 `204`로 **본문이 없어서** JSON으로 읽을 
 
 ## 질문 노트
 
-_아직 없음_
+<details><summary>Q. Mapper XML의 `<delete>`는 뭐예요? HTML 태그인가요? <sub>2026-11-24 · 수업 중</sub></summary>
+
+**A.** HTML이 아니라 MyBatis Mapper XML에서 **DELETE SQL을 담는 태그**다. SQL 종류에 따라 `<select>`(조회)·`<insert>`(추가)·`<update>`(수정)·`<delete>`(삭제)를 고른다. `id`는 Mapper 인터페이스의 메서드 이름과 같아야 하고(`deleteById`), `#{id}` 자리에 메서드로 받은 값이 들어간다. 이름이 다르면 `Invalid bound statement`.
+
+```xml
+<delete id="deleteById">
+    DELETE FROM students
+    WHERE id = #{id}
+</delete>
+```
+
+관련: 이 파일의 "8. Mapper XML" 섹션, 최종 코드의 `StudentMapper.xml`
+</details>

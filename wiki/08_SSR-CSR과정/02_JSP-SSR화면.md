@@ -1226,4 +1226,11 @@ Controller: 요청 처리, 검색어 수신(`@RequestParam`), Model에 데이터
 
 ## 질문 노트
 
-_아직 없음_
+<details><summary>Q. Controller는 React 컴포넌트 같은 건가요? <sub>2026-11-24 · 수업 중</sub></summary>
+
+**A.** 하는 일이 다르다. React 컴포넌트는 **브라우저**에서 화면 한 부분(JSX)을 그린다. Controller는 **서버**에서 돌아가는 Java 클래스로, "이 주소로 요청이 오면 이 메서드를 실행한다"를 정하고 화면 이름(`@Controller` → JSP) 또는 데이터(`@RestController` → JSON)를 돌려준다. React는 `fetch`로 요청을 보내는 쪽, Controller는 그 요청을 받는 쪽이다.
+
+(강의 밖 내용) Spring에서 말하는 "컴포넌트"는 Spring이 만들어 관리하는 객체(빈)를 뜻한다. `@Controller`·`@Service`·`@Repository`가 모두 그 한 종류라서 Spring 기준으로는 Controller도 컴포넌트지만, 화면 조각인 React 컴포넌트와는 다른 개념이다.
+
+관련: 이 파일의 "5. Controller · Service · Mapper · JSP 역할 나누기"
+</details>
