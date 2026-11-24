@@ -1155,6 +1155,8 @@ H2 = 데이터를 저장하는 관계형 DB, JPA = Java 객체와 관계형 DB�
 <details><summary>Q. H2 Console에 접속했는데 `students` 테이블이 안 보인다. 무엇을 확인하는가?</summary>
 
 로그인 화면의 **JDBC URL이 `application.properties`의 `spring.datasource.url`과 같은지** 확인한다 (예: `jdbc:h2:mem:studentdb`). 다르면 다른 빈 DB에 접속한 것이다. 서버가 실행 중인지도 본다.
+
+> 💡 보충: 2026-11-24 Spring Boot 4.1.3(H2 2.4)으로 확인해 보니, 주소가 다르면 빈 DB로 들어가지 않고 `Database "…" not found, either pre-create it or allow remote database creation … [90149-240]` 오류로 로그인이 거절됐다.
 </details>
 
 <details><summary>Q. 메모리 모드와 파일 모드는 주소와 결과가 어떻게 다른가?</summary>

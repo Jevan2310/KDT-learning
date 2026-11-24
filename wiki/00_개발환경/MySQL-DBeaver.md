@@ -107,6 +107,8 @@ SELECT VERSION(), CURRENT_USER();
 
 > 💡 보충: **macOS에서 설치할 때** — 같은 다운로드 페이지에서 Select Operating System을 **macOS**로 바꾸고 칩에 맞는 **DMG Archive**(Apple Silicon = ARM 64-bit, Intel = x86 64-bit)를 받는다. 설치 중에 `root` 비밀번호를 정하고, 서버 시작·중지와 자동 시작은 **시스템 설정 맨 아래의 MySQL 항목**에서 한다 (Windows의 서비스 설정 대신). DBeaver도 macOS용 DMG를 받는다. DBeaver 단축키는 `Ctrl` 대신 **`Cmd`** 다 (문장 실행 `Cmd + Enter`).
 
+> 💡 보충: **이 Mac은 Homebrew로 설치했다** (2026-11-24, `brew install mysql@8.4` → MySQL 8.4.13). DMG를 또 설치하지 않는다. 처음에는 `root` 비밀번호가 없고 서버도 꺼져 있다. 켜기 `brew services start mysql@8.4`(로그인할 때 자동 시작) 또는 `brew services run mysql@8.4`(이번 한 번), 끄기 `brew services stop mysql@8.4`. 접속 `mysql -uroot` → `ALTER USER 'root'@'localhost' IDENTIFIED BY '…';`로 비밀번호를 정한다 (비밀번호는 파일에 적지 않는다). 자세한 순서는 [DB 01 개념정리](../../practice/06_데이터베이스과정/01_DB이해-실습환경/2026-11-24/개념정리.md).
+
 ## 자주 쓰는 명령
 
 | 하고 싶은 것 | 명령·조작 |

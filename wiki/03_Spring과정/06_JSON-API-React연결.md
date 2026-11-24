@@ -440,6 +440,8 @@ import StudentList from "./components/StudentList.jsx";
 
 ## 헷갈리기 쉬운 점
 - **`/students`는 HTML, `/api/students`는 JSON.** React에서 `/students`를 요청하면 HTML이 와서 `response.json()`이 실패한다.
+
+> 💡 보충: 2026-11-24 실제로 해 보니 `http://localhost:8080/students`는 `StudentController`에 `@CrossOrigin`이 없어서 **CORS에서 먼저 막힌다** (Console: `No 'Access-Control-Allow-Origin' header` + `TypeError: Failed to fetch`). `response.json()` 오류(`Unexpected token '<', "<!doctype "...`)는 주소를 `/api/students`처럼 **상대 경로**로 써서 Vite의 `index.html`을 받았을 때 난다. 또 Spring Boot 4.x의 JSON은 속성 순서가 `name, learning, id`처럼 아래 예시와 다를 수 있다 (동작에는 영향 없음).
 - **API 경로뿐 아니라 포트도 바꾼다.** Node는 `3000/students`, Spring은 `8080/api/students`.
 - **화면용 컨트롤러는 `@Controller`, API는 `@RestController`.** 기존 화면용 컨트롤러를 바꾸지 않고 API 컨트롤러를 추가한다.
 - **`@CrossOrigin`의 출처는 실제 React 주소와 정확히 같아야** 한다. 포트가 바뀌면 고치고, `localhost` ≠ `127.0.0.1`.

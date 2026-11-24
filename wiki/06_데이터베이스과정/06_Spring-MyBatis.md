@@ -97,6 +97,12 @@ XML에서 id가 findAll인 SQL 실행
 
 > 💡 보충: Spring 과정 수업 화면의 프로젝트는 Spring Boot 4.x였다 ([02_SpringBoot시작](../03_Spring과정/02_SpringBoot시작.md) 맨 앞). start.spring.io에서 4.x로 만들었다면 Starter도 **4.0 계열**로 맞춘다. 버전이 안 맞으면 서버가 제대로 실행되지 않을 수 있다.
 
+> 💡 보충: 2026-11-24 start.spring.io 확인 결과
+> - MyBatis Framework는 **Spring Boot 4.0.x에서만** 고를 수 있다. 기본값(4.2.0)이면 `Dependency 'mybatis' is not compatible with Spring Boot 4.2.0`이 나오므로 Spring Boot를 **4.0.10**으로 바꿔서 만든다 (Starter 4.0.1이 들어간다). Starter 3.0.5를 4.x에 넣으면 `required a bean of type '…StudentMapper' that could not be found`가 난다.
+> - Boot 4.x에서는 웹 의존성 이름이 `spring-boot-starter-web` 대신 `spring-boot-starter-webmvc`다.
+> - Boot 4는 JSON 라이브러리(Jackson 3)가 속성을 알파벳 순서로 내보낸다 (`classId, email, id, name, registeredDate`). 아래 JSON 예시와 순서가 달라도 정상이다.
+> - 자세한 실행 결과는 [DB 06 개념정리](../../practice/06_데이터베이스과정/06_Spring-MyBatis/2026-11-24/개념정리.md).
+
 **`build.gradle`** — 기존 플러그인·Java 설정은 그대로 두고 `dependencies`에 추가한다.
 
 ```groovy
