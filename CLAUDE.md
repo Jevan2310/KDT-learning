@@ -262,3 +262,4 @@ nf <노션 링크> -o <파일>        # 파일로 저장 (scratchpad에)
 - 2026-11-19: 업데이트 확인 — Spring 000·05·06 회차 추가, Spring 04 강의 변경 반영. 슬로그 10-30 오리엔테이션 페이지를 `wiki/_풀스택과정소개.md`·`wiki/00_개발환경/GitHub-블로그-기록.md`로 정리 (강사 소개는 제외). `.gitignore`에 H2 DB 파일 추가.
 - 2026-11-20: Git협업과정 추가 (`wiki/07_Git협업과정/`, 회차 6개). 연습용 git 저장소는 `KDT학습/` 밖에 만들도록 `practice/CLAUDE.md` 6장에 추가.
 - 2026-11-20: 팀프로젝트 `02_기초팀프로젝트` 추가 (2팀 GitHub 병합 연습 — 파일 하나 올려 PR·Merge 테스트, Organization + Fork 방식). 10장에 팀 저장소 clone 위치 규칙 추가.
+- 2026-11-24: SSR-CSR과정 추가 (`wiki/08_SSR-CSR과정/`, 노션에 공개된 01~04회차, 05·06은 ⏳). 실습 환경(JSP는 Spring Boot 3.5·Java 17·War, React는 Vite 프록시)을 `practice/CLAUDE.md` 6장에 추가.
