@@ -263,3 +263,4 @@ nf <노션 링크> -o <파일>        # 파일로 저장 (scratchpad에)
 - 2026-11-20: Git협업과정 추가 (`wiki/07_Git협업과정/`, 회차 6개). 연습용 git 저장소는 `KDT학습/` 밖에 만들도록 `practice/CLAUDE.md` 6장에 추가.
 - 2026-11-20: 팀프로젝트 `02_기초팀프로젝트` 추가 (2팀 GitHub 병합 연습 — 파일 하나 올려 PR·Merge 테스트, Organization + Fork 방식). 10장에 팀 저장소 clone 위치 규칙 추가.
 - 2026-11-24: SSR-CSR과정 추가 (`wiki/08_SSR-CSR과정/`, 노션에 공개된 01~04회차, 05·06은 ⏳). 실습 환경(JSP는 Spring Boot 3.5·Java 17·War, React는 Vite 프록시)을 `practice/CLAUDE.md` 6장에 추가.
+- 2026-11-27: 업데이트 확인 — MSA과정 추가 (`wiki/09_MSA과정/`, 슬로그 2026-11-25 "마이크로서비스 아키텍쳐", 노션에 공개된 01~04회차, 05·06은 ⏳). 실습 환경(`student-service`·`notice-service`·`notice-web`)을 `practice/CLAUDE.md` 6장에 추가. 강의 변경 반영: SSR 03·04(수업 중 MyBatis 검색·삭제 API, 새 App.css), DB 04·05·06(수업 SQL, 한글 별칭·HAVING, MariaDB 설정 — 비밀번호는 옮기지 않음).

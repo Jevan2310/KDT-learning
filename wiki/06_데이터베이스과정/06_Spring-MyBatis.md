@@ -1,6 +1,6 @@
 # 06. Spring과 MyBatis — 작성한 SQL을 서비스에서 실행하기
 
-> 과정: 데이터베이스과정 · [노션 원문](https://app.notion.com/p/41a848f71c9b8003b2fee29896ffb232) · 최종 갱신일: 2026-11-18
+> 과정: 데이터베이스과정 · [노션 원문](https://app.notion.com/p/41a848f71c9b8003b2fee29896ffb232) · 최종 갱신일: 2026-11-27
 
 ## 한눈에 보기
 - 지금까지 DBeaver에서 직접 실행한 SQL을 **백엔드가 요청을 받을 때 실행**하도록 만든다: 요청 → Spring → SQL 실행 → DB 조회 → JSON 응답.
@@ -8,6 +8,8 @@
 - **Mapper** = `StudentMapper.java`(호출할 메서드, `@Mapper`) + `StudentMapper.xml`(실행할 SQL). XML의 **`namespace` = 인터페이스 전체 이름**, SQL의 **`id` = 메서드 이름**으로 연결된다. `resultType`에는 **한 행**을 담을 타입(`Student`)을 쓴다.
 - 값은 **`#{...}`** 로 바인딩한다 (문자열도 따옴표 없이). `map-underscore-to-camel-case=true`로 `registered_date` ↔ `registeredDate`가 연결된다. `useGeneratedKeys`로 새 `id`를 객체에 받는다.
 - `@RestController`에서 Mapper를 **생성자로 받아** 호출하고, 학생 CRUD API(`GET`/`POST`/`PUT`/`DELETE /students`)를 만들었다. 비밀번호는 `application.properties`에 쓰지 않고 **환경변수 `${DB_PASSWORD}`** 로 읽는다.
+
+> 💡 보충: 2026-11-23 원문에 **수업 버전**이 추가됐다: MariaDB 연결 설정(5장), 수업 프로젝트 캡처(Initializr 의존성·파일 구조), Lombok `Student`, Thymeleaf 화면용 `@Controller`(실습 정리). 수업 버전은 그대로 합치면 드라이버·Lombok 의존성, `mapper`/`mappers` 폴더 이름, 없는 `index` 템플릿 때문에 오류가 난다 → 각 코드 아래 보충.
 
 ## 학습 목표
 - MyBatis가 하는 일을 이해한다.
@@ -146,6 +148,27 @@ DB_PASSWORD=<비밀번호>
 
 - 이번엔 로컬 확인용으로 `root`를 쓰지만, 실제 서비스에서는 **필요한 권한만 가진 별도 계정**을 쓴다.
 
+> 💡 보충: 2026-11-23 원문의 MySQL 설정은 비밀번호 줄이 실제 값을 직접 적은 수업 버전으로 바뀌었다 (공개 저장소라 옮기지 않는다). 바로 아래 설명은 그대로 `${DB_PASSWORD}` 방식이라, 이 문서는 설명대로 `${DB_PASSWORD}`로 둔다.
+
+**MariaDB를 쓰는 경우** (2026-11-23 원문에 추가)
+
+```properties
+spring.application.name=mybatis
+
+spring.datasource.url=jdbc:mariadb://localhost:3306/school
+spring.datasource.username=root
+spring.datasource.password=****
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+
+mybatis.mapper-locations=classpath:/mappers/*.xml
+mybatis.configuration.map-underscore-to-camel-case=true
+```
+
+> 💡 보충: 
+> - 비밀번호 값은 공개 저장소라 `****`로 가렸다. MySQL처럼 `${DB_PASSWORD}`를 써도 된다.
+> - 위 `build.gradle`에는 MySQL·H2 드라이버만 있다. 그대로 MariaDB 설정으로 실행하면 서버가 켜지지 않고 `Cannot load driver class: org.mariadb.jdbc.Driver`가 난다 (실행 확인). `runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'`를 추가한다 ([SSR 02](../08_SSR-CSR과정/02_JSP-SSR화면.md)의 `build.gradle`처럼). 수업 프로젝트는 Initializr에서 MariaDB Driver를 골라 만들었다 (실습 정리의 "수업 화면의 프로젝트").
+> - `spring.application.name=mybatis`는 수업 프로젝트 이름 기준이다.
+
 > 💡 보충: IntelliJ에서 **Run → Edit Configurations…** → 실행할 애플리케이션 → **Environment variables** 칸에 `DB_PASSWORD=실제비밀번호`를 넣는다. 이렇게 하면 비밀번호가 `application.properties`(=공개 저장소에 올라가는 파일)에 남지 않는다.
 
 **H2를 쓰는 경우** — 앞에서 파일 방식으로 만든 DB의 연결 정보를 쓴다.
@@ -158,9 +181,11 @@ spring.datasource.username=sa
 spring.datasource.password=
 spring.datasource.driver-class-name=org.h2.Driver
 
-mybatis.mapper-locations=classpath:/mappers/*.xml
+mybatis.mapper-locations=classpath:/mapper/*.xml
 mybatis.configuration.map-underscore-to-camel-case=true
 ```
+
+> 💡 보충: 원문의 H2 설정만 `classpath:/mapper/*.xml`(s 없음)이다. XML을 파일 구조대로 `resources/mappers/`에 두면 서버는 켜지지만 첫 요청에서 **500**과 `Invalid bound statement (not found): …StudentMapper.findAll`이 난다 (MySQL 연결로 같은 설정을 넣어 실행 확인). `mapper-locations`의 폴더 이름과 실제 XML 폴더 이름을 맞춘다. 수업 화면의 프로젝트는 폴더가 `resources/mapper/`였다.
 
 - 가정: 기존 DB 주소가 `jdbc:h2:~/school`, 처음부터 MySQL 모드·소문자 설정을 썼음, 사용자 `sa`·비밀번호 없음. **다르면 실제 값에 맞춘다.**
 - `IFEXISTS=TRUE` = 지정한 파일 DB가 없으면 새 빈 DB를 만들지 않고 **오류**를 낸다.
@@ -400,6 +425,12 @@ src/main
 
 - 메인 클래스와 **같은 패키지**에 Java 파일을 두어 Spring이 찾을 수 있게 한다.
 
+**수업 화면의 프로젝트** (2026-11-23 원문에 추가된 캡처)
+- Initializr에서 추가한 의존성: **MyBatis Framework, Spring Web, Thymeleaf, Lombok, MariaDB Driver**
+- 프로젝트 `mybatis`, 패키지 `com.example.mybatis`: `MybatisApplication`, `Student`, `StudentController`, `StudentMapper`(인터페이스) / `resources`: **`mapper/StudentMapper.xml`**, `static`, `templates`, `application.properties`
+
+> 💡 보충: 수업 프로젝트는 XML 폴더가 `mapper`(s 없음)인데, 원문의 MySQL·MariaDB 설정은 `classpath:/mappers/*.xml`이다. 이대로면 `Invalid bound statement (not found)`가 난다 (H2 설정 아래 보충). 폴더 이름과 `mapper-locations`를 하나로 맞춘다.
+
 ### 단계 흐름
 1. 새 프로젝트 생성 (Gradle - Groovy, Spring Web) → `build.gradle`에 MyBatis Starter·MySQL·H2 드라이버 추가 → Gradle 불러오기
 2. `application.properties`에 DB 연결 + MyBatis 설정, IntelliJ 실행 설정에 `DB_PASSWORD` 환경변수
@@ -484,6 +515,30 @@ public class Student {
 }
 ```
 </details>
+
+**`Student.java` — 수업 버전 (Lombok, 패키지 `com.example.mybatis`)**
+
+```java
+package com.example.mybatis;
+
+import lombok.*;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+public class Student {
+
+    private Integer id;
+    private String name;
+    private String email;
+    private LocalDate registeredDate;
+    private Integer classId;
+}
+
+```
+
+> 💡 보충: `@Getter`·`@Setter`가 위의 getter·setter를 대신 만든다 (`import lombok.*;`는 Lombok 어노테이션을 한 줄로 모두 가져오기). 위 `build.gradle`에는 Lombok이 없으므로 `compileOnly 'org.projectlombok:lombok'`·`annotationProcessor 'org.projectlombok:lombok'`을 추가해야 한다 (수업 프로젝트는 Initializr에서 Lombok 추가). 생성자를 쓰지 않아 기본 생성자가 생기고, MyBatis는 기본 생성자 + setter로 값을 채운다 → `registeredDate`·`classId`까지 JSON에 나온다 (실행 확인). 패키지가 `com.example.mybatis`이면 XML의 `namespace`·`resultType`도 `com.example.mybatis.…`로 맞춘다.
 
 **`StudentMapper.java`**
 
@@ -581,7 +636,41 @@ public interface StudentMapper {
 
 > 💡 보충: XML 안의 SQL 끝에는 `;`을 붙이지 않았다. `#{registeredDate}`처럼 값 자리에는 **Java 속성 이름**을, `SET`·`INSERT`의 열에는 **DB 열 이름**(`registered_date`)을 쓴다.
 
-**`StudentController.java`**
+**`StudentController.java` — 수업 버전 (화면용 `@Controller`, 패키지 `com.example.mybatis`)**
+
+```java
+package com.example.mybatis;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+
+@Controller
+public class StudentController {
+
+    private final StudentMapper studentMapper;
+
+    public StudentController(StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
+
+    @GetMapping("/")
+    public String index(Model model) {
+
+        List<Student> list = studentMapper.findAll();
+        model.addAttribute("students", list);
+
+        return "index";
+
+    }
+}
+```
+
+> 💡 보충: Thymeleaf를 넣은 수업 프로젝트의 화면용 Controller다. `/`에 접속하면 학생 목록을 Model에 `students`로 담고 `index` 템플릿을 돌려준다 ([Spring 03](../03_Spring과정/03_Thymeleaf-학생목록.md)과 같은 방식). 그런데 `templates/index.html`은 원문에 없다. 템플릿이 없으면 `/`는 **500** (`TemplateInputException: Error resolving template [index]`)이다 (실행 확인). 이번 회차의 JSON API·`fetch` 실습은 아래 `@RestController` 버전으로 한다. 두 클래스 이름이 같으므로 한 패키지에 둘 다 두지 않는다.
+
+**`StudentController.java`** (JSON API)
 
 ```java
 package com.hancoding.studentmybatis;

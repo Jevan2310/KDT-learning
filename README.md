@@ -18,7 +18,8 @@ KDT 수업 복습 및 학습용 저장소.
 │   ├── 05_비동기과정/  실행 순서 → Promise·async/await → 블로킹·논블로킹 → 느린 API 화면
 │   ├── 06_데이터베이스과정/ SQL 기초 → 조회 → 수정·삭제·트랜잭션 → JOIN → Spring + MyBatis
 │   ├── 07_Git협업과정/ 버전 관리 → 3가지 영역 → 원격 저장소 → 브랜치 → 충돌 → Organization·PR
-│   └── 08_SSR-CSR과정/ SSR·CSR 배경 → JSP로 SSR → 요청 흐름 확인 → React로 CSR
+│   ├── 08_SSR-CSR과정/ SSR·CSR 배경 → JSP로 SSR → 요청 흐름 확인 → React로 CSR
+│   └── 09_MSA과정/    모놀리식·MSA → Spring 학생 API → Express 공지 API → React 공지 화면
 ├── practice/        연습 기록 (과정/회차/날짜별 답안·코드·채점)
 └── scripts/         노션 강의 페이지를 받아오는 스크립트
 ```
@@ -45,6 +46,7 @@ KDT 수업 복습 및 학습용 저장소.
 | 06. 데이터베이스 과정 | SQL부터 Spring 연동까지 (MySQL · DBeaver · JOIN · 트랜잭션 · MyBatis) | 01~06회차 |
 | 07. Git 협업 과정 | Git 활용 협업 (add·commit · push·pull·clone · 브랜치 · 충돌 해결 · Fork·PR) | 01~06회차 |
 | 08. SSR·CSR 과정 | 같은 화면, 다른 처리 방식 (JSP · 개발자 도구 Network · React CSR · Thymeleaf) | 01~04회차 (05·06 공개 전) |
+| 09. MSA 과정 | React·Spring Boot·Express로 서비스 연결하기 (모놀리식·MSA · 서비스별 API · Vite 프록시 · 장애 처리) | 01~04회차 (05·06 공개 전) |
 
 ## 출처
 

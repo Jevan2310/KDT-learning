@@ -1,6 +1,6 @@
 # 04. React로 CSR 화면 만들고 장점 경험하기 — 같은 학생 데이터를 JSON으로 받아 브라우저에서 화면 구성
 
-> 과정: SSR-CSR과정 · [노션 원문](https://app.notion.com/p/420848f71c9b80ce814ede25d5dbb7c5) · 최종 갱신일: 2026-11-24
+> 과정: SSR-CSR과정 · [노션 원문](https://app.notion.com/p/420848f71c9b80ce814ede25d5dbb7c5) · 최종 갱신일: 2026-11-27
 
 ## 한눈에 보기
 - [02](02_JSP-SSR화면.md)의 JSP 화면(`/students`)은 그대로 두고, **같은 `StudentService`** 를 쓰는 `@RestController`인 `StudentApiController`를 추가해 `/api/students`에서 학생 목록을 **JSON**으로 응답한다. 검색 결과가 없으면 `[]` — **실패가 아니다.**
@@ -9,8 +9,10 @@
 - 폼 `onSubmit`에서 `event.preventDefault()`로 기본 제출(문서 이동)을 막고 state만 바꾼다 → **새 Document 요청 없이 API(Fetch/XHR) 요청으로 목록만 갱신**된다.
 - 로딩·오류·빈 결과·목록을 조건부 렌더링으로 구분한다. 초기 HTML에는 `<div id="root"></div>`만 있고 학생 목록이 없으며, 이번 예제는 **검색어를 URL에 저장하지 않는다.**
 
+> 💡 보충: 2026-11-25 노션 원문에 **두 버전이 섞여 있다** ([02](02_JSP-SSR화면.md)와 같은 상황). ① 원래 자료: 패키지 `com.hancoding.renderingdemo`, `GET /api/students` 하나, `className` 필드. 본문 설명·JSON 예시·Network 주소(`/api/students?keyword=`)는 모두 ① 기준이다. ② **수업 중 추가된 코드**: 02의 MyBatis 프로젝트(`com.example.jsp`)에 `@RequestMapping("/api")` API 다섯 개와 Service·Mapper·XML을 추가했다. 원문의 React `App.jsx`는 **② 주소 `/api/search/students/v1`** 로 요청하도록 바뀌었고, `App.css`에 덧붙이는 스타일도 디자인 토큰·다크 모드 버전으로 바뀌었다. 이 문서는 ①의 설명 흐름을 그대로 두고 ② 코드는 실습 1 아래에 따로 정리한다 (실습 정리의 "노션 원문의 두 버전").
+
 ## 학습 목표
-- 기존 학생 조회 로직을 JSON API로 제공한다.
+- 기존 학생 조회 로직을 JSON API로 제공한다. (지금 JSP 화면은 HTML 형태로 반환한다)
 - React에서 API를 호출해 학생 목록을 표시한다.
 - 기본 폼 제출을 막고 검색 결과만 갱신한다.
 - 로딩·오류·빈 결과를 구분해 표시한다.
@@ -86,7 +88,7 @@ StudentApiController ─┘
 
 > 💡 보충: [Spring 06](../03_Spring과정/06_JSON-API-React연결.md)과 같은 구성이다 (그때는 Repository, 이번엔 Service를 생성자로 받는다). `List<Student>`를 반환하면 Spring이 getter(`getId()`, `getName()`, `getEmail()`, `getClassName()`)를 읽어 JSON 속성(`id`, `name`, `email`, `className`)을 만든다.
 
-> 💡 보충: 코드의 패키지는 `com.hancoding.renderingdemo`다. 내 프로젝트 패키지에 맞춘다. 수업 중 MyBatis로 만든 버전(02의 `com.example.jsp`)은 `Student` 필드가 `classId`이고 검색 SQL(`searchByName`)이 `id`를 조회하지 않아서, JSON 속성이 강의 예시와 다를 수 있다. React 표는 `student.id`·`student.className`을 쓰므로 `/api/students` JSON부터 확인한다.
+> 💡 보충: 코드의 패키지는 `com.hancoding.renderingdemo`(①)다. 내 프로젝트 패키지에 맞춘다. 수업에서는 02의 MyBatis 프로젝트(`com.example.jsp`)에 `@RequestMapping("/api")`를 붙인 API Controller를 따로 만들었다 (실습 1의 "수업 중 추가된 코드"). ② 코드에는 `/api/students` 주소가 없어서 **404**이고, JSON 속성도 `className`이 아니라 `classId`다 (실행 확인).
 
 ### 3. JSON 응답 확인 — 빈 배열은 실패가 아니다
 Spring을 다시 실행하고 `http://localhost:8080/api/students`에 접속하면 학생 네 명이 JSON 배열로 보인다.
@@ -127,6 +129,8 @@ Spring을 다시 실행하고 `http://localhost:8080/api/students`에 접속하�
 | `http://localhost:8080/api/students?keyword=없는학생` | 빈 배열 `[]` |
 
 - **검색 결과가 없는 것은 요청 실패가 아니다.** 정상적으로 검색했지만 조건에 맞는 학생이 없는 상태다.
+
+> 💡 보충: ② 코드로 같은 확인을 하려면 `/api/students/all`(전체), `/api/search/students/v1?keyword=한`(검색)을 연다. 학생은 DB `students` 테이블에 들어 있는 만큼 나오고, 검색 결과는 `"id": null`, 반은 `"classId": 1`처럼 번호로 나온다 (실행 확인, 실습 1의 API 표).
 
 ### 4. Vite 프록시 — `/api` 요청을 Spring으로 전달
 React 개발 서버는 5173, Spring은 8080 포트를 쓴다. React에서 `/api`로 요청하면 **Vite가 Spring으로 전달**하도록 `vite.config.js`에 `server.proxy`를 설정한다 (전체 코드는 실습 3).
@@ -314,6 +318,8 @@ React가 화면 갱신
 
 > 💡 보충: 검색 요청 이름이 `keyword=%ED%95%9C`처럼 인코딩되어 보일 수 있다 (`URLSearchParams`가 인코딩한 것). Payload 탭에서는 `keyword: 한`으로 보인다. 응답 헤더의 `Content-Type`도 document는 `text/html`, API는 `application/json`으로 다르다 ([03](03_SSR요청흐름.md)).
 
+> 💡 보충: 위 표의 `/api/students?keyword=…`는 ① 기준 설명이다. 2026-11-25 원문 `App.jsx`(② 주소)를 그대로 쓰면 Fetch/XHR에 **`/api/search/students/v1?keyword=`**, 검색 후에는 `/api/search/students/v1?keyword=한`이 보인다. 새 Document 요청이 없는 것은 같다 (실행 확인). Strict Mode라서 처음 요청은 두 번 보였다.
+
 ### 10. JSP SSR과 React CSR 비교
 두 화면을 각각 열어 같은 검색어로 검색한다.
 
@@ -374,6 +380,17 @@ Spring 프로젝트와 **별도 폴더**에 React 프로젝트를 만든다.
 - Spring과 React 개발 서버는 **각각 다른 터미널에서 실행한 채 유지**한다.
 - 연결은 **Vite 프록시**(`/api` → `http://localhost:8080`)로 한다. Spring에 `@CrossOrigin`은 붙이지 않는다.
 
+### 노션 원문의 두 버전
+
+| 구분 | ① 원래 자료 | ② 수업 중 추가된 코드 |
+|---|---|---|
+| Spring 프로젝트 | `rendering-demo` (패키지 `com.hancoding.renderingdemo`) | 02의 MyBatis 프로젝트 (패키지 `com.example.jsp`) |
+| 학생 데이터 | Java 목록 | MyBatis로 DB `students` 조회 |
+| API 주소 | `GET /api/students?keyword=` 하나 | `/api/students/all`, `/api/search/students/v1?keyword=`, `/api/search/students/v2/{keyword}`, `/api/search/id/{keyword}`, `/api/delete/id/{id}` |
+| JSON 속성 | `id`, `name`, `email`, `className` | `id`, `name`, `email`, `classId` (검색 결과는 `id`가 `null`) |
+| Controller 생성자 | 직접 작성 | Lombok `@AllArgsConstructor` |
+| React `fetch` 주소 | `/api/students?…` (2026-11-22 원문) | `/api/search/students/v1?…` (2026-11-25 원문) |
+
 ### 단계 흐름
 1. Spring에 `StudentApiController` 추가 → 재실행 → 브라우저에서 목록·`keyword=한`·`keyword=없는학생` JSON 확인
 2. React 프로젝트 생성 → `npm install` → `npm run dev`로 기본 화면 확인
@@ -417,6 +434,212 @@ Spring을 다시 실행하고 핵심 개념 3장의 세 주소로 JSON을 확인
 
 > 💡 보충: JSP용 `StudentPageController`는 `keyword.trim()`을 한 뒤 Service에 넘기지만, 이 API Controller는 받은 값을 그대로 넘긴다. React 쪽에서 `trim()`한 값을 보내므로 이번 화면에서는 차이가 없다.
 
+#### 수업 중 추가된 코드 (버전 ②, 패키지 `com.example.jsp`)
+02의 MyBatis 프로젝트(02의 "최종 코드 (버전 ②)")에 `StudentApiController`를 추가하고 Service·Mapper·XML을 아래처럼 바꿨다. `Student.java`·`StudentPageController.java`·`students.jsp`는 02 그대로다.
+
+> 💡 보충: 아래 코드는 원문 그대로다. 보충의 "실행 확인"은 이 네 파일과 02의 ② `Student`·`StudentPageController`를 넣고 MySQL 8.4(`students` 5명, `class_id` 포함)에 연결해 Spring Boot 3.5.16 · JDK 21로 실행한 결과다 (2026-11-27).
+
+**`StudentApiController.java`**
+
+```java
+package com.example.jsp;
+
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@AllArgsConstructor
+@RequestMapping("/api")
+public class StudentApiController {
+
+    private final StudentService service;
+
+    // 학생 전체 조회
+    @GetMapping("/students/all")
+    public List<Student> studentsAll() {
+        return service.studentList();
+    }
+
+    // 학생 검색
+    @GetMapping("/search/students/v1")
+    public List<Student> studentsV1(
+            @RequestParam(name = "keyword", defaultValue = "")
+                                      String keyword) {
+        return service.findStudents(keyword);
+    }
+
+    // 학생 검색
+    @GetMapping("/search/students/v2/{keyword}") // /search/students/v2/한코딩
+    public List<Student> studentsV2(
+            @PathVariable(name = "keyword")
+            String keyword) {
+        return service.findStudents(keyword);
+    }
+
+    // 학생 번호로 이름 검색
+    @GetMapping("/search/id/{keyword}") // /search/students/v2/한코딩
+    public String studentId(
+            @PathVariable(name = "keyword")
+            Long keyword) {
+        return service.findUser(keyword);
+    }
+
+    @GetMapping("/delete/id/{id}")
+    public String deleteStudent(@PathVariable(name = "id") Long id) {
+        return service.deleteStudent(id);
+    }
+
+}
+```
+
+| 요청 | 검색어·번호를 받는 곳 | 하는 일 | 응답 (실행 확인) |
+|---|---|---|---|
+| `GET /api/students/all` | 없음 | 전체 학생 (`findAll`) | JSON 배열. `id`·`name`·`email`·`classId`가 모두 채워짐 |
+| `GET /api/search/students/v1?keyword=한` | 쿼리 파라미터 (`@RequestParam`, 없으면 `""`) | 이름 검색 | 한코딩 1명. `"id": null` |
+| `GET /api/search/students/v2/한코딩` | 주소 경로 (`@PathVariable`) | 이름 검색 | 한코딩 1명. `"id": null` |
+| `GET /api/search/id/1` | 주소 경로 (`Long`) | 번호로 이름 하나 조회 | 글자 `한코딩` (`text/plain`) |
+| `GET /api/delete/id/5` | 주소 경로 | 번호로 학생 삭제 | `정상적으로 삭제되었습니다.` → 같은 번호를 다시 요청하면 `삭제할 대상을 찾을 수 없습니다.` |
+
+> 💡 보충: 처음 나온 것 (강의 밖 설명)
+> - `@RequestMapping("/api")`: 클래스의 모든 주소 앞에 `/api`를 붙인다. `@GetMapping("/students/all")` → `/api/students/all`. ([DB 06](../06_데이터베이스과정/06_Spring-MyBatis.md)의 `@RequestMapping("/students")`과 같은 방식)
+> - `@PathVariable(name = "keyword")`: 주소의 `{keyword}` 자리 값을 받는다. v1은 검색어를 `?keyword=한`(쿼리 파라미터)으로, v2는 `/v2/한코딩`(주소의 한 부분)으로 받는다. 둘 다 같은 `findStudents`를 부른다.
+> - `import org.springframework.web.bind.annotation.*;`: 이 패키지의 어노테이션(`@RestController`, `@GetMapping` …)을 한 줄로 모두 가져온다.
+
+> 💡 보충: 실행해 보니 이 코드에서 주의할 점
+> - **`@AllArgsConstructor` + `private final`**: Lombok이 `service`를 받는 생성자를 만들어 ① 코드의 직접 쓴 생성자와 같은 생성자 주입이 된다. 서버는 정상 실행됐다. `import lombok.RequiredArgsConstructor;`는 import만 하고 쓰지 않는다 (아래 Service의 `import org.apache.ibatis.annotations.Param;`도 마찬가지). 지워도 동작은 같다.
+> - **`/search/id/{keyword}`의 주석이 틀렸다.** 주석은 v2의 주석을 복사한 `// /search/students/v2/한코딩`이지만, 실제 주소는 `/api/search/id/1`처럼 **번호**를 넣는다. `Long`으로 받으므로 `/api/search/id/abc`는 **400**, 없는 번호(`/api/search/id/99`)는 **200에 빈 본문**이다 (Mapper가 `null`을 돌려줌). 매개변수 이름도 `keyword`지만 실제로는 학생 번호다.
+> - **v2는 빈 검색어를 받을 수 없다.** `/api/search/students/v2/`는 **404**다. 전체 목록은 v1(`keyword` 없음 → `""`)이나 `/api/students/all`로 본다.
+> - **삭제를 `GET`으로 만들었다.** 브라우저 주소창에 `/api/delete/id/5`를 입력하기만 해도(주소창 = GET 요청) 바로 지워지고, 자동 커밋이라 되돌릴 수 없다 ([DB 04](../06_데이터베이스과정/04_수정삭제-트랜잭션.md)). 같은 주소로 `DELETE` 요청을 보내면 오히려 **405**다. 데이터를 바꾸는 요청은 [DB 06](../06_데이터베이스과정/06_Spring-MyBatis.md)처럼 `@DeleteMapping` + `DELETE` 방식으로 만든다.
+> - `String`을 돌려주는 두 주소(`/api/search/id/…`, `/api/delete/id/…`)의 응답은 JSON이 아니라 **글자**다 (`Content-Type: text/plain;charset=UTF-8`). `List<Student>`를 돌려주는 주소는 `application/json`.
+
+**`StudentService.java`**
+
+```java
+package com.example.jsp;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@AllArgsConstructor
+@Slf4j
+public class StudentService {
+
+    private final StudentMapper mapper;
+
+    public List<Student> studentList() {
+        return mapper.findAll();
+    }
+
+    public void insertStudent(String name, String email, Long classId) {
+
+        Student s = new Student(name, email, classId);
+
+        try {
+            mapper.insert(s);
+            log.info("데이터 등록에 성공했습니다");
+        } catch (Exception e) {
+            log.error("데이터 등록에 실패했습니다.");
+        }
+    }
+
+    public List<Student> findStudents(String keyword) {
+        return mapper.searchByName("%" + keyword + "%");
+    }
+
+    public String findUser(Long id) {
+        return mapper.searchNameById(id);
+    }
+
+    public String deleteStudent(Long id) {
+        int result = mapper.deleteById(id);
+
+        if (result == 0) {
+            return "삭제할 대상을 찾을 수 없습니다.";
+        }
+        return "정상적으로 삭제되었습니다.";
+    }
+}
+```
+
+> 💡 보충: 02와 달라진 곳은 `findStudents`가 검색어 앞뒤에 `%`를 붙여 넘기는 것(`"%" + keyword + "%"`)과 `findUser`·`deleteStudent` 추가다. XML도 `LIKE CONCAT('%', #{keyword}, '%')` → `LIKE #{keyword}`로 바뀌어 짝이 맞는다. 검색어가 `""`이면 `%%`가 되어 전체 학생이 나온다 (실행 확인, `/api/search/students/v1?keyword=`). `deleteStudent`는 Mapper가 돌려준 **영향받은 행 수**가 0이면 "찾을 수 없음"으로 판단한다 ([DB 06](../06_데이터베이스과정/06_Spring-MyBatis.md)의 404 판단과 같은 원리).
+
+**`StudentMapper.java`**
+
+```java
+package com.example.jsp;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+
+@Mapper
+public interface StudentMapper {
+
+    List<Student> findAll();
+
+    String searchNameById(Long id);
+
+    int insert(Student student);
+
+    List<Student> searchByName(String keyword);
+
+    int deleteById(Long id);
+}
+```
+
+**`resources/mappers/StudentMapper.xml`**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.jsp.StudentMapper">
+
+    <select id="findAll" resultType="com.example.jsp.Student">
+        SELECT id, name, email, class_id
+        FROM students
+        ORDER BY id
+    </select>
+
+    <select id="searchByName" resultType="com.example.jsp.Student">
+        SELECT name, email, class_id
+        FROM students
+        WHERE name LIKE #{keyword}
+    </select>
+
+    <select id="searchNameById" resultType="String">
+        SELECT name
+        FROM students
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into students (name, email, class_id)
+        values (#{name}, #{email}, #{classId})
+    </insert>
+
+    <delete id="deleteById">
+        delete from students where id = #{id}
+    </delete>
+
+</mapper>
+```
+
+> 💡 보충:
+> - `findAll`은 이제 `class_id`까지 네 열을 조회한다. 02의 `Student`에는 기본 생성자가 없어서 MyBatis가 **열 개수·순서가 맞는 생성자**를 쓰는데, 네 열(id, name, email, class_id)이 `@AllArgsConstructor`(id, name, email, classId)와 맞아서 02에서 오류가 나던 `findAll`이 이제 동작한다 (실행 확인).
+> - `searchByName`은 여전히 **`id`를 조회하지 않는다** → 검색 결과 JSON의 `"id"`가 모두 `null`이다. JSP 화면(`/students`)도 이 SQL을 쓰므로 번호 칸이 빈칸이다 ([03](03_SSR요청흐름.md)의 수업 화면도 그렇다). React 표에서 생기는 문제는 실습 4 보충.
+> - `resultType="String"`: 이름 한 칸만 조회하므로 객체가 아니라 문자열 하나로 받는다. `<delete>`는 [DB 06](../06_데이터베이스과정/06_Spring-MyBatis.md)에서 본 삭제 SQL 태그다.
+
 ### 실습 2. React 프로젝트 만들기
 **① Node.js와 npm 확인** (일반 터미널)
 
@@ -430,7 +653,7 @@ npm --version
 
 Node.js는 사용하는 Vite 버전의 요구사항을 만족해야 한다. 버전 오류가 나면 공식 안내에 맞는 LTS 버전을 쓴다. ([Vite 시작 안내](https://vite.dev/guide/))
 
-**② 프로젝트 생성** — Spring 프로젝트 **내부가 아니라**, 두 프로젝트를 둘 상위 폴더에서 실행한다. 추가 안내가 나오면 React와 JavaScript 기본 구성을 고른다.
+**② 프로젝트 생성** — Spring 프로젝트 **내부가 아니라**, 두 프로젝트의 상위 폴더에서 실행한다. 추가 안내가 나오면 React와 JavaScript 기본 구성을 고른다.
 
 ```bash
 npm create vite@latest rendering-react -- --template react
@@ -453,11 +676,13 @@ npm run dev
 ```
 
 ### 실습 3. `vite.config.js` — 프록시 설정
+`vite.config.js`는 React 프로젝트 **최상위 폴더**(`package.json`, `README.md`와 같은 곳)에 있다 (원문의 수업 화면).
 
 ```javascript
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
 
@@ -472,8 +697,10 @@ export default defineConfig({
       },
     },
   },
-});
+})
 ```
+
+> 💡 보충: 2026-11-25 원문은 Vite가 만든 파일 모양(작은따옴표, 세미콜론 없음, `// https://vite.dev/config/` 주석)에 `server` 부분만 넣은 코드로 바뀌었다. 이전 원문(큰따옴표·세미콜론)과 동작은 같다.
 
 설정 후 Vite 개발 서버를 종료하고 다시 실행한다.
 
@@ -510,7 +737,7 @@ function App() {
         });
 
         const response = await fetch(
-          `/api/students?${params.toString()}`
+          `/api/search/students/v1?${params.toString()}`
         );
 
         if (!response.ok) {
@@ -661,6 +888,13 @@ export default App;
 
 > 💡 보충: `catch (error)`의 `error`는 catch 블록 안에서만 쓰는 오류 객체이고, state `error`와 이름만 같은 다른 값이다. `setError(error.message)`는 오류 객체의 메시지를 state에 저장한다.
 
+> 💡 보충: 2026-11-25 원문에서 `fetch` 주소가 `/api/students?…`에서 **`/api/search/students/v1?…`** 로 바뀌었다. 이 주소는 ② 수업 코드(`StudentApiController`의 v1)에만 있다. ① 코드(`/api/students`)로 실습한다면 이 줄을 `` `/api/students?${params.toString()}` ``로 둔다. 그대로 두면 Spring에 없는 주소라 404 오류 안내가 나온다.
+
+> 💡 보충: 이 코드를 ② API에 연결해 실행하면 (실행 확인, Vite 8.3.8 · React 19 · Chrome)
+> - 이름·이메일은 나오지만 **번호와 소속 반 칸이 빈칸**이다. 검색 SQL(`searchByName`)이 `id`를 조회하지 않아 `student.id`가 `null`이고, ② `Student`에는 `className`이 없어서(`classId`만 있음) `student.className`이 `undefined`다.
+> - `key={student.id}`가 모두 `null`이라 Console에 ``Encountered two children with the same key, `null` ``(같은 key가 둘 이상) 오류가 찍힌다. 화면은 그려지지만 React가 행을 구분하지 못한다 (key는 [React 06](../01_React과정/06_목록-조건부렌더링.md)).
+> - 맞추려면 XML `searchByName`의 `SELECT`에 `id`를 넣고, 소속 반은 `{student.classId}`로 바꾸거나 `classes`와 JOIN해 반 이름을 받는다 ([DB 05](../06_데이터베이스과정/05_테이블관계-JOIN.md)).
+
 ### 실습 5. 스타일 적용
 1. 이전 JSP 실습의 `students.css` 내용을 React 프로젝트의 `src/App.css`에 복사한다. 기존 `App.css`의 기본 예제 스타일은 교체한다.
 2. `src/main.jsx`에 다음 줄이 있으면 지워서 기본 스타일이 섞이지 않게 한다.
@@ -669,32 +903,349 @@ export default App;
 import "./index.css";
 ```
 
-3. `App.css` 끝에 다음 스타일을 추가한다.
+3. `App.css` 끝에 다음 스타일을 추가한다. 주석으로 나눈 부분은 디자인 토큰(색·둥글기 변수) → 다크 모드 → `index.css`의 Vite 템플릿 레이아웃 덮어쓰기 → 레이아웃 → 헤더 → 검색 폼 → 버튼 → 검색 요약 → 상태 메시지(로딩 스피너) → 테이블 → 모바일 순서다.
+
+<details><summary><code>App.css</code> 끝에 추가하는 스타일 (2026-11-25 원문, 전체)</summary>
 
 ```css
-.secondary-button {
-  background: #e7edf6;
-  color: #274b86;
+/* ===== 디자인 토큰 ===== */
+:root {
+  --page-bg: #f5f7fb;
+  --card-bg: #ffffff;
+  --ink: #1b2333;
+  --ink-soft: #5b6578;
+  --line: #e3e7ef;
+  --primary: #3b5bdb;
+  --primary-hover: #2f4ac0;
+  --primary-soft: #eef2ff;
+  --row-hover: #f7f9fd;
+  --danger: #c92a2a;
+  --danger-soft: #fff5f5;
+  --danger-line: #ffc9c9;
+  --radius: 14px;
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04),
+    0 8px 24px rgba(16, 24, 40, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #11131a;
+    --card-bg: #1a1d27;
+    --ink: #eef1f7;
+    --ink-soft: #9aa3b5;
+    --line: #2a2e3b;
+    --primary: #6b8afd;
+    --primary-hover: #8aa2ff;
+    --primary-soft: rgba(107, 138, 253, 0.14);
+    --row-hover: #20242f;
+    --danger: #ff8787;
+    --danger-soft: rgba(255, 135, 135, 0.08);
+    --danger-line: rgba(255, 135, 135, 0.35);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* index.css의 Vite 템플릿 레이아웃 덮어쓰기 */
+body {
+  background: var(--page-bg);
+}
+
+#root {
+  width: 100%;
+  border-inline: none;
+  text-align: left;
+}
+
+/* ===== 레이아웃 ===== */
+.container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 56px 24px 80px;
+  box-sizing: border-box;
+}
+
+/* ===== 헤더 ===== */
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header .label {
+  display: inline-block;
+  padding: 4px 12px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.page-header p:last-child {
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+
+/* ===== 검색 폼 ===== */
+.search-form {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-card);
+}
+
+.search-form label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.search-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.search-controls input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--page-bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.search-controls input::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
+.search-controls input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--card-bg);
+  box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+/* ===== 버튼 ===== */
+.search-controls button {
+  height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+.search-controls button:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.search-controls button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.search-controls button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.search-controls .secondary-button {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.search-controls .secondary-button:hover:not(:disabled) {
+  background: var(--primary-soft);
+  box-shadow: inset 0 0 0 1px var(--primary);
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: wait;
 }
 
+/* ===== 검색 요약 ===== */
+.search-summary {
+  margin-top: 20px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.search-summary strong {
+  margin-left: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ===== 상태 메시지 ===== */
 .status-message,
-.error-message {
-  margin-top: 24px;
-  padding: 24px;
-  border-radius: 12px;
-  background: #ffffff;
+.error-message,
+.empty-message {
+  margin-top: 20px;
+  padding: 40px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  color: var(--ink-soft);
+  text-align: center;
+  font-size: 15px;
+}
+
+.status-message::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  vertical-align: -2px;
+  border: 2px solid var(--line);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-message {
+  border-style: dashed;
 }
 
 .error-message {
-  border: 1px solid #d69a9a;
-  color: #9a2525;
+  border-color: var(--danger-line);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 500;
+}
+
+/* ===== 테이블 ===== */
+.table-wrapper {
+  margin-top: 20px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-card);
+}
+
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+  padding: 14px 20px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-wrapper thead th {
+  background: var(--page-bg);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-wrapper tbody td {
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+
+.table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-wrapper tbody tr {
+  transition: background 0.12s;
+}
+
+.table-wrapper tbody tr:hover {
+  background: var(--row-hover);
+}
+
+/* 번호 열 */
+.table-wrapper td:first-child {
+  width: 1%;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 이름 열 */
+.table-wrapper td:nth-child(2) {
+  font-weight: 600;
+}
+
+/* 이메일 열 */
+.table-wrapper td:nth-child(3) {
+  color: var(--ink-soft);
+}
+
+/* ===== 모바일 ===== */
+@media (max-width: 640px) {
+  .container {
+    padding: 32px 16px 56px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+  }
+
+  .search-form {
+    padding: 18px;
+  }
+
+  .search-controls {
+    flex-wrap: wrap;
+  }
+
+  .search-controls input {
+    flex-basis: 100%;
+  }
+
+  .search-controls button {
+    flex: 1;
+  }
+
+  .table-wrapper th,
+  .table-wrapper td {
+    padding: 12px 14px;
+  }
 }
 ```
+</details>
 
 <details><summary>참고: <code>App.css</code> 앞부분 — 02의 <code>students.css</code> 전체</summary>
 
@@ -811,7 +1362,22 @@ th {
 ```
 </details>
 
-> 💡 보충: JSP와 React가 같은 클래스 이름(`container`, `search-form`, `empty-message` …)을 쓰므로 CSS를 그대로 옮길 수 있다. `students.css`가 모든 `button`에 파란 배경을 주므로 `.secondary-button`으로 전체 보기 버튼만 연한 색으로 덮어쓴다. `.status-message`·`.error-message`는 JSP에 없던 로딩·오류 상태라서 새로 추가한 것이다.
+> 💡 보충: JSP와 React가 같은 클래스 이름(`container`, `search-form`, `empty-message` …)을 쓰므로 CSS를 옮길 수 있다. 추가 스타일에 처음 나온 것 (강의 밖 설명):
+>
+> | 코드 | 뜻 |
+> |---|---|
+> | `--page-bg: #f5f7fb;` → `var(--page-bg)` | **CSS 변수**(디자인 토큰). 색·둥글기 값을 `:root`에 이름으로 모아 두고 꺼내 쓴다 |
+> | `@media (prefers-color-scheme: dark) { :root { … } }` | 운영체제·브라우저가 다크 모드일 때만 변수 값을 어두운 색으로 바꾼다 |
+> | `.status-message::before` + `@keyframes spin` | 로딩 문구 앞에 빙글 도는 원(스피너)을 만든다 |
+> | `@media (max-width: 640px)` | 화면 폭 640px 이하(휴대폰)에서 여백·글자 크기를 줄이고 버튼을 줄바꿈한다 |
+
+> 💡 보충: 이 추가 스타일은 주석 `/* index.css의 Vite 템플릿 레이아웃 덮어쓰기 */`처럼 **`index.css`를 남겨 둔 상태**를 전제로 쓴 코드다 (`#root`의 폭 1126px·가운데 정렬·좌우 테두리를 되돌린다). 위 2단계(`index.css` import 제거)와 맞지 않는다. 2026-11-27 Vite 8.3.8 템플릿 + Chrome으로 확인한 결과:
+>
+> | 구성 | 결과 |
+> |---|---|
+> | 강의 순서대로: `students.css` + 추가 스타일, `main.jsx`의 `index.css` 제거 | 라이트 모드는 정상. **다크 모드에서는 표 배경이 흰색으로 남아 학생 이름(밝은 글자)이 거의 안 보인다.** `students.css`의 `table { background: #ffffff; }`를 추가 스타일이 덮어쓰지 않기 때문 |
+> | `App.css` = 추가 스타일만, `main.jsx`의 `import './index.css'` 유지 | 라이트·다크 모두 정상 |
+> | `App.css` = 추가 스타일만, `index.css`도 제거 | 글꼴 설정이 없어 `Times New Roman`, `body` 여백 8px |
 
 ### 실습 6. 기능 확인
 두 서버(Spring `http://localhost:8080`, Vite `http://localhost:5173`)가 모두 실행 중인지 확인하고 `http://localhost:5173`에 접속한다.
@@ -826,10 +1392,12 @@ th {
 | 전체 보기 클릭 | 입력창 초기화와 전체 목록 |
 | 검색 중 | 버튼 비활성화와 로딩 안내 |
 
+> 💡 보충: "학생 네 명"은 ① 고정 목록 기준이다. ② 코드는 DB에 들어 있는 학생 수만큼 나오고, 번호·소속 반 칸은 비어 있다 (실습 4 보충). 로딩 안내는 다크 모드에서도 스피너와 함께 잘 보였다 (Network 지연으로 확인).
+
 ### 실습 7. Network·로딩·실패 상태 확인
 **Network** (핵심 개념 9장)
 1. 새로고침 → Type `document` 요청의 Response에 학생 목록 행이 없고 `<div id="root"></div>`가 있는지 본다.
-2. **Fetch/XHR** 필터 → `/api/students?keyword=` 요청의 Response에 JSON 배열이 있는지 본다.
+2. **Fetch/XHR** 필터 → `/api/students?keyword=` 요청의 Response에 JSON 배열이 있는지 본다. (2026-11-25 원문 `App.jsx`를 그대로 썼다면 `/api/search/students/v1?keyword=` — 핵심 개념 9장 보충)
 3. Network 목록을 지우고 `한` 검색 → `/api/students?keyword=한`만 생기고 **새 Document 요청이 없는지** 본다.
 
 **로딩 상태** — Network의 속도 제한 메뉴에서 느린 연결(예: **Slow 3G**)을 고르고 다른 검색어로 검색한다.
@@ -874,6 +1442,10 @@ Spring이 종료되면 Vite가 API를 전달하지 못해 오류 응답이나 �
 > - `fetch`에 `http://localhost:8080/...` 전체 주소를 쓰면 프록시를 거치지 않고 다른 출처로 직접 요청하게 되어, `@CrossOrigin`이 없는 이번 Spring에서는 CORS 오류가 난다.
 > - `strictPort: true`라서 5173을 다른 프로젝트가 쓰고 있으면 Vite가 실행되지 않는다.
 > - 실패 실험 뒤 Spring을 다시 켜도 같은 검색어로는 다시 요청하지 않는다 → 강의 순서대로 새로고침한다.
+> - (수업 추가 코드) **원문 `App.jsx`는 ② 주소 `/api/search/students/v1`로 요청한다.** Spring 쪽이 ①(`/api/students`)이면 주소를 맞춘다.
+> - (수업 추가 코드) **검색 SQL이 `id`를 조회하지 않으면** JSON의 `id`가 `null`이 되어 React 표의 번호가 비고 `key`가 겹친다. 화면에 쓸 열은 SQL `SELECT`에 모두 넣는다.
+> - (수업 추가 코드) **삭제를 `GET` 주소로 만들면 주소를 열기만 해도 지워진다.** 데이터를 바꾸는 요청은 `POST`·`PUT`·`DELETE`로 만든다.
+> - (수업 추가 코드) **`@PathVariable` 검색(v2)은 빈 검색어를 못 받는다** (`/v2/` → 404). 검색어가 없을 수 있으면 `@RequestParam(defaultValue = "")`(v1).
 
 ## 빠른 참고 (치트시트)
 
@@ -894,6 +1466,10 @@ Spring이 종료되면 Vite가 API를 전달하지 못해 오류 응답이나 �
 | 상태별 표시 | `&&` 조건부 렌더링 | `{!loading && error !== "" && (<p role="alert">{error}</p>)}` |
 | CSR 확인 | Network | `document` Response에 목록 없음, Fetch/XHR에 `/api/students?keyword=` |
 | 로딩 화면 확인 | Network 속도 제한 | Slow 3G |
+| (수업 추가) 클래스의 모든 주소 앞에 붙이기 | `@RequestMapping` | `@RequestMapping("/api")` + `@GetMapping("/students/all")` → `/api/students/all` |
+| (수업 추가) 주소 경로에서 값 받기 | `@PathVariable` | `@GetMapping("/search/students/v2/{keyword}")` + `@PathVariable(name = "keyword") String keyword` |
+| (수업 추가) `LIKE` 검색어에 `%` 붙이기 | Service에서 문자열 연결 | `mapper.searchByName("%" + keyword + "%")` + `WHERE name LIKE #{keyword}` |
+| (수업 추가) 값 하나만 조회 | `resultType="String"` | `SELECT name FROM students WHERE id = #{id}` |
 
 ## 확인 문제
 강의에 별도 "💬 확인하기"는 없어서, 본문의 질문형 제목과 확인 표에서 뽑았다.
@@ -982,6 +1558,21 @@ Vite가 API를 전달하지 못해 오류 응답이나 연결 실패가 생기�
 <details><summary>Q. React 화면에서 `한`으로 검색한 뒤 새로고침하면 검색 결과가 유지되는가?</summary>
 
 유지되지 않는다. 이번 예제는 검색어를 URL에 반영하지 않고 React state로만 관리하기 때문이다. CSR에서도 URL에 저장할 수 있지만 자동으로 되는 기능은 아니다.
+</details>
+
+<details><summary>Q. (수업 추가 코드) `/api/search/students/v1?keyword=한`과 `/api/search/students/v2/한`은 검색어를 어떻게 받는가? 검색어 없이 전체를 보려면?</summary>
+
+v1은 쿼리 파라미터를 `@RequestParam(name = "keyword", defaultValue = "")`로, v2는 주소의 `{keyword}` 자리를 `@PathVariable`로 받는다. 둘 다 같은 `findStudents`를 부른다. 전체는 v1에 검색어 없이(`""` → `%%`) 요청하거나 `/api/students/all`을 쓴다. v2는 `/v2/`처럼 빈 검색어를 넣을 수 없다 (404).
+</details>
+
+<details><summary>Q. (수업 추가 코드) 원문 React 코드를 ② API(`/api/search/students/v1`)에 연결하면 번호·소속 반 칸이 비는 이유는?</summary>
+
+검색 SQL `searchByName`이 `SELECT name, email, class_id`로 `id`를 조회하지 않아 JSON의 `id`가 `null`이고, ② `Student`에는 `className` 없이 `classId`만 있어서 `student.className`이 `undefined`다. `key={student.id}`도 모두 `null`이라 같은 key 오류가 Console에 찍힌다. SQL에 `id`를 넣고, 반은 `classId`를 쓰거나 JOIN으로 반 이름을 받는다.
+</details>
+
+<details><summary>Q. (수업 추가 코드) `@GetMapping("/delete/id/{id}")`처럼 삭제를 GET으로 만들면 무엇이 문제인가?</summary>
+
+브라우저 주소창에 주소를 입력하기만 해도(GET 요청) 학생이 삭제되고 자동 커밋으로 확정된다. 데이터를 바꾸는 요청은 DB 06처럼 `@DeleteMapping`으로 만들고 `fetch(…, { method: "DELETE" })`로 보낸다.
 </details>
 
 ## 완료 체크

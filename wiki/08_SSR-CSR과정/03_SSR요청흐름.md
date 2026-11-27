@@ -1,6 +1,6 @@
 # 03. SSR의 요청 흐름과 화면 갱신 확인하기 — Network로 HTML 응답과 검색 요청 보기
 
-> 과정: SSR-CSR과정 · [노션 원문](https://app.notion.com/p/420848f71c9b80c0bd0dc7eb33d046e6) · 최종 갱신일: 2026-11-24
+> 과정: SSR-CSR과정 · [노션 원문](https://app.notion.com/p/420848f71c9b80c0bd0dc7eb33d046e6) · 최종 갱신일: 2026-11-27
 
 ## 한눈에 보기
 - 화면만 보고는 서버가 HTML을 만들었는지, 브라우저가 목록을 만들었는지 알 수 없다. **브라우저가 실제로 받은 응답**을 개발자 도구 **Network**에서 확인한다.
@@ -285,7 +285,7 @@ students.jsp
 | 항목 | 확인한 내용 |
 |---|---|
 | Network | 요청과 응답 확인 |
-| Document | 페이지의 HTML 문서 요청 |
+| Document (문서) | 페이지의 HTML 문서 요청 |
 | Request URL | 검색 경로와 검색어 확인 |
 | Content-Type | HTML·JSON 등 응답 형식 구분 |
 | Response | 서버가 실제로 보낸 응답 본문 |
@@ -299,8 +299,13 @@ students.jsp
 새 코드는 없다. [02_JSP-SSR화면](02_JSP-SSR화면.md)에서 만든 화면을 **크롬 개발자 도구로 관찰**한다.
 
 ### 준비
-- 02회차 Spring 프로젝트를 실행하고 `http://localhost:8080/students`에 접속한다 → **학생 네 명**이 보이는지 확인.
+- 02회차 Spring 프로젝트를 실행하고 `http://localhost:8080/students`에 접속한다 → 학생이 **데이터베이스에 들어 있는 만큼** 보이는지 확인.
 - 개발자 도구 열기: 페이지 빈 곳 오른쪽 클릭 → **검사** → **Network** 탭.
+
+> 💡 보충: 2026-11-25 원문에 수업 화면 캡처가 추가됐다 (02의 MyBatis 버전 ②로 실행한 화면).
+> - 표의 **번호 칸이 비어 있고**, 소속 반 칸에는 반 이름 대신 **숫자(`class_id`)** 가 보인다. 번호가 비는 것은 ② 검색 SQL(`searchByName`)이 `id`를 조회하지 않기 때문이다 (실행 확인 — [04](04_React-CSR화면.md) 실습 1 보충). 숫자가 보이는 것은 수업 JSP가 `${student.classId}`를 출력하도록 고친 것으로 보인다 (원문 JSP 코드는 `className` 그대로 — [02](02_JSP-SSR화면.md) 보충). 아래 Response 예시의 `<td>1</td>`(번호)·`<td>풀스택 A반</td>`는 ① 고정 목록 기준이다.
+> - Network 목록에는 `students`(Status `200`, Type `document`)와 `students.css`(`200`, `stylesheet`)만 보였다. `students.css`의 Initiator가 `students:14`인데, `students` 문서 **14번째 줄**(`<link rel="stylesheet" href="/css/students.css">`)이 이 요청을 일으켰다는 뜻이다.
+> - Response는 빈 줄 세 개 뒤 4번째 줄에 `<!DOCTYPE html>`이 나온다. JSP 맨 위 `<%@ page … %>`·`<%@ taglib … %>` 줄은 처리되어 사라지고 줄바꿈만 남은 것이다 (02 JSP로 실행 확인).
 
 > 💡 보충: 단축키는 Mac `Cmd + Option + I`, Windows `F12` 또는 `Ctrl + Shift + I`. 크롬 언어가 한국어면 개발자 도구 메뉴도 한국어로 보일 수 있다 (예: Network → 네트워크, Elements → 요소, Headers → 헤더, Response → 응답, Preserve log → 로그 보존).
 

@@ -1,13 +1,15 @@
 # 05. 테이블 관계와 JOIN 이해하기 — 외래키·`INNER JOIN`·`LEFT JOIN`·`GROUP BY`
 
-> 과정: 데이터베이스과정 · [노션 원문](https://app.notion.com/p/41a848f71c9b80d6a83fe687b6d615dd) · 최종 갱신일: 2026-11-18
+> 과정: 데이터베이스과정 · [노션 원문](https://app.notion.com/p/41a848f71c9b80d6a83fe687b6d615dd) · 최종 갱신일: 2026-11-27
 
 ## 한눈에 보기
 - 학생 테이블에 반 이름을 바로 넣으면 **같은 반 이름이 반복**되고, 이름을 바꿀 때 모든 학생 행을 고쳐야 한다. → 반은 **`classes` 테이블**로 나누고, 학생에게는 **반 번호 `class_id`** 만 저장한다.
 - **기본키**는 행을 구분하고, **외래키**는 다른 테이블의 행을 가리킨다. `students.class_id` → `classes.id`. 반 하나에 학생 여럿 = **일대다(1:N) 관계**.
 - `ALTER TABLE`로 `class_id` 열과 **외래키 제약 조건**(`FOREIGN KEY … REFERENCES classes (id)`)을 추가했다. 이제 없는 반 번호(999)는 DB가 막는다. `NULL`(미배정)은 허용.
 - **`INNER JOIN … ON s.class_id = c.id`** 는 연결되는 행만, **`LEFT JOIN`** 은 왼쪽(`FROM` 뒤) 테이블의 행을 모두 남기고 짝이 없으면 `NULL`. `AS`로 결과 열·테이블에 별칭을 붙인다.
-- **`COUNT(*)`** 는 행 수, **`COUNT(열)`** 은 그 열이 `NULL`이 아닌 행 수. **`GROUP BY`** 로 반별로 묶어 센다. 학생 없는 반까지 0명으로 보려면 `classes LEFT JOIN students` + **`COUNT(s.id)`**.
+- **`COUNT(*)`** 는 행 수, **`COUNT(열)`** 은 그 열이 `NULL`이 아닌 행 수. **`GROUP BY`** 로 반별로 묶어 센다. 학생 없는 반까지 0명으로 보려면 `classes LEFT JOIN students` + **`COUNT(s.id)`**. 묶은 그룹에 조건을 걸 때는 **`HAVING`** (2026-11-23 원문에 추가).
+
+> 💡 보충: 2026-11-23 원문에 **수업 중 추가된 SQL**이 들어왔다: 외래키 확인용 `INSERT`(5장 끝), JOIN을 단계별로 쓴 SQL(7장 끝), `HAVING`(10장 끝). `LEFT JOIN` 예제(8장)와 `COUNT` 별칭(9장)도 수업 버전(한글 별칭)으로 바뀌었다. 5장의 `INSERT`를 실행하면 학생이 6명이 되어 이후 결과 숫자가 강의 예시와 달라진다 (5장 끝 보충).
 
 ## 학습 목표
 - 정보를 여러 테이블에 나누어 저장하는 이유를 이해한다.
@@ -129,6 +131,26 @@ REFERENCES classes (id);
 - **열 이름을 `class_id`로 짓는 것만으로 외래키가 되지 않는다.** 제약 조건을 설정해야 DB가 관계를 검사한다.
 - 두 `ALTER TABLE`도 **각각 한 번만** 실행한다. 구조 변경은 [04](04_수정삭제-트랜잭션.md)의 데이터 변경 트랜잭션과 구분해서 실행한다.
 
+**수업 중 추가된 코드 — 외래키가 막는지 `INSERT`로 확인**
+
+```sql
+-- 데이터가 들어가지 않는 것을 확인
+insert into students (name, email, class_id)
+values ('KDT', 'kdt@example.com', 100);
+
+-- 데이터가 들어가는 것을 확인
+insert into students (name, email, class_id)
+values ('KDT', 'kdt@example.com', 1);
+```
+
+> 💡 보충: 원문의 이메일 값은 실제 메일 서비스 주소 형식이라 공개 저장소에서는 `kdt@example.com`으로 바꿔 적었다. 동작은 같다.
+
+> 💡 보충: 실행 결과 (MySQL 8.4, 강의 데이터 다섯 명 + 반 세 개)
+> - 첫 `insert`(반 번호 100)는 `ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (… FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`))`로 막힌다. 두 번째(반 번호 1)는 들어간다. 6장의 `UPDATE … class_id = 999`와 같은 외래키 검사를 `INSERT`로 본 것이다.
+> - 두 번째 `insert`를 실행하면 **학생이 6명**이 되고 KDT가 A반에 들어간다. 그러면 이후 결과가 강의 예시와 달라진다: A반 학생 수 3 → **4**, `COUNT(*)` 5 → **6**, `COUNT(class_id)` 4 → **5**, `INNER JOIN`·`LEFT JOIN` 결과에 KDT 행 추가, 반별 학생 수의 A반 **4**.
+> - 같은 문장을 다시 실행하면 이메일 `UNIQUE` 때문에 `ERROR 1062 (23000): Duplicate entry 'kdt@example.com' for key 'students.email'`.
+> - 강의 예시 숫자와 맞추려면 확인한 뒤 지운다: `DELETE FROM students WHERE email = 'kdt@example.com';`
+
 ### 6. 존재하지 않는 반 번호를 넣으면?
 오류 확인용 예제다. 따로 선택해서 실행한다.
 
@@ -199,17 +221,76 @@ ORDER BY s.id ASC;
 | `s` | `students` |
 | `c` | `classes` |
 
+**수업 중 추가된 코드 — JOIN을 단계별로 쓰기**
+
+```sql
+-- 1. 메인 테이블 조회
+select * from students
+
+-- 2. 외래키가 있는 테이블 조회
+select * from classes
+
+-- 3. 두 테이블 조인 (전체 컬럼 조회)
+select * from students
+inner join classes
+on students.class_id = classes.id
+
+-- 4. 두 테이블 조인 (필요한 컬럼만 조회_ver.1_컬럼명에 중복이 없는 데이터)
+select email, registered_date from students
+inner join classes
+on students.class_id = classes.id
+
+-- 5. 두 테이블 조인 (필요한 컬럼만 조회_ver.2_컬럼명에 중복이 있는 데이터를 추가) -- 오류
+select email, registered_date, name from students
+inner join classes
+on students.class_id = classes.id
+
+-- 6. 두 테이블 조인 (필요한 컬럼만 조회_ver.3_컬럼명에 중복이 있는 데이터를 추가)
+select students.email, 
+students.registered_date, 
+students.name, 
+classes.name from students
+inner join classes
+on students.class_id = classes.id
+
+-- 7. 두 테이블 조인 (필요한 컬럼만 조회_ver.4_테이블명에 별칭 붙이기)
+select s.email, 
+s.registered_date, 
+s.name, 
+c.name from students as s
+inner join classes as c
+on s.class_id = c.id
+
+-- 8. 두 테이블 조인 (필요한 컬럼만 조회_ver.5_컬럼명에 별칭 붙이기)
+select s.email as 이메일, 
+s.registered_date as 등록일자, 
+s.name as 학생이름, 
+c.name as 반이름
+from students as s
+inner join classes as c
+on s.class_id = c.id
+```
+
+> 💡 보충: 실행 결과 (MySQL 8.4, 한 문장씩 실행)
+> - 3번 `select *`는 두 테이블의 열이 모두 나와 `id`·`name`이 두 번씩 보인다 (`id, name, email, registered_date, class_id, id, name`).
+> - 4번은 `email`·`registered_date`가 `students`에만 있어서 테이블 이름 없이도 된다.
+> - 5번은 주석대로 **오류**다: `ERROR 1052 (23000): Column 'name' in field list is ambiguous`. 두 테이블 모두 `name`이 있어서 어느 쪽인지 모른다.
+> - 6·7번은 동작하지만 결과 열 이름이 `name`, `name`으로 같아 구분이 어렵다 → 8번처럼 열에도 별칭을 붙인다. 한글 별칭(`이메일`, `반이름` …)도 따옴표 없이 동작한다 (H2 2.5에서도 확인).
+> - 문장 끝에 세미콜론(`;`)이 없고 `ORDER BY`도 없다. 한 문장씩 선택해 실행한다. `ORDER BY`가 없으면 행 순서는 정해져 있지 않다.
+
 ### 8. 반이 없는 학생도 조회 — `LEFT JOIN`
 
 ```sql
-SELECT
-    s.name AS student_name,
-    c.name AS class_name
-FROM students AS s
-LEFT JOIN classes AS c
-    ON s.class_id = c.id
-ORDER BY s.id ASC;
+select s.email as 이메일, 
+s.registered_date as 등록일자, 
+s.name as 학생이름, 
+c.name as 반이름
+from students as s
+left join classes as c
+on s.class_id = c.id
 ```
+
+> 💡 보충: 2026-11-23 원문에서 이 SQL이 수업 버전(열 네 개 + 한글 별칭, `ORDER BY` 없음)으로 바뀌었다. 아래 결과 예시 표는 이전 SQL `SELECT s.name AS student_name, c.name AS class_name FROM students AS s LEFT JOIN classes AS c ON s.class_id = c.id ORDER BY s.id ASC;` 기준이다. 바뀐 SQL을 실행하면 열이 `이메일 | 등록일자 | 학생이름 | 반이름`이고, 박스프링부트 행의 `반이름`이 `NULL`이다 (실행 확인).
 
 | student_name | class_name |
 |---|---|
@@ -250,10 +331,12 @@ WHERE class_id = 1;
 
 ```sql
 SELECT
-    COUNT(*) AS total_students,
-    COUNT(class_id) AS assigned_students
+    COUNT(*) AS 총학생수,
+    COUNT(class_id) AS 반배정된학생수
 FROM students;
 ```
+
+> 💡 보충: 2026-11-23 원문에서 별칭이 한글로 바뀌었다 (이전: `total_students`, `assigned_students`). 결과 열 이름이 `총학생수 | 반배정된학생수`로 나온다 (MySQL 8.4·H2 2.5 실행 확인).
 
 | 표현 | 의미 |
 |---|---|
@@ -309,6 +392,26 @@ C반 | 학생 id: NULL | 학생 이름: NULL
 - → **실제 학생 수를 세려고 학생의 기본키 `s.id`를 쓴다.**
 
 **이 결과에 미배정 학생이 없는 이유** — 반 목록 기준으로 집계했기 때문에, 연결할 반이 없는 미배정 학생은 어느 반에도 포함되지 않는다. 그래서 **반별 학생 수의 합(4)이 전체 학생 수(5)와 다를 수 있다.**
+
+**`HAVING` — `GROUP BY`로 묶은 결과에 조건 걸기** (2026-11-23 원문에 추가)
+
+```sql
+-- 학생 수가 5명보다 적은 반만 조회하는 쿼리
+SELECT
+    c.id AS class_id,
+    c.name AS class_name,
+    COUNT(s.id) AS student_count
+FROM classes AS c
+LEFT JOIN students AS s
+    ON c.id = s.class_id
+group by c.id having count(s.id) < 5
+```
+
+> 💡 보충: (강의 밖 설명 + 실행 확인)
+> - `WHERE`는 묶기 **전**의 행을 거르고, `HAVING`은 `GROUP BY`로 묶은 **뒤**의 그룹을 거른다. 그래서 `COUNT(s.id) < 5`처럼 **집계 결과**로 거르는 조건은 `HAVING`에 쓴다.
+> - 강의 데이터는 세 반 모두 5명보다 적어서(3·1·0) 결과가 위 반별 학생 수와 같다. `< 2`로 바꾸면 B반(1)·C반(0)만 남는다 (실행 확인).
+> - `GROUP BY c.id`만 쓰고 `c.name`을 `SELECT`했는데도 오류가 없다. `c.id`가 `classes`의 기본키라 반 이름이 하나로 정해지기 때문이다 (MySQL 8.4 기본 설정, H2 2.5 모두 실행됨). 앞 SQL처럼 `GROUP BY c.id, c.name`으로 써도 결과는 같다.
+> - 끝에 세미콜론과 `ORDER BY`가 없다.
 
 ### 11. JOIN을 쓸 때 확인할 점
 
@@ -366,7 +469,7 @@ ORDER BY c.id ASC, s.id ASC;
 3. 현재 학생 확인 → A반 3명, B반 1명 배정, 박스프링은 `NULL`
 4. 없는 반 번호(999)로 외래키 오류 확인
 5. `INNER JOIN` → `LEFT JOIN` → 미배정 학생만 찾기
-6. `COUNT` → `GROUP BY` → 반 이름별 학생 수
+6. `COUNT` → `GROUP BY` → 반 이름별 학생 수 → (수업 추가) `HAVING`으로 그룹 거르기
 
 ### 반 테이블과 외래키 (한 번만 실행)
 
@@ -384,7 +487,7 @@ VALUES
 
 SELECT *
 FROM classes
-ORDER BY id ASC;
+ORDER BY id DESC;
 
 ALTER TABLE students
 ADD COLUMN class_id INT;
@@ -475,6 +578,11 @@ ORDER BY id ASC;
 - **반별 학생 수의 합 ≠ 전체 학생 수일 수 있다.** 미배정 학생은 반 기준 집계에 안 들어간다.
 - **일대다 JOIN에서 반 이름이 여러 번 나오는 건 정상이다.** 반마다 한 줄이 필요하면 `GROUP BY`.
 
+> 💡 보충: 수업 추가 SQL에서 헷갈리기 쉬운 점
+> - **두 테이블에 같은 열 이름(`name`)이 있으면 `테이블.열`로 써야 한다.** 그냥 `name`은 `ERROR 1052 … ambiguous`.
+> - **집계 결과(`COUNT` 등)로 그룹을 거를 때는 `WHERE`가 아니라 `HAVING`.** `HAVING`은 `GROUP BY` 뒤에 쓴다.
+> - **외래키 확인용 `INSERT`(반 번호 1)는 실제로 학생을 추가한다.** 이후 학생 수가 강의 예시보다 하나 많아진다.
+
 ## 빠른 참고 (치트시트)
 
 | 하고 싶은 것 | 쓰는 것 | 예시 |
@@ -487,8 +595,9 @@ ORDER BY id ASC;
 | 테이블 별칭 | `AS` | `FROM students AS s` |
 | 짝 없는 행만 | `LEFT JOIN` + `IS NULL` | `… LEFT JOIN classes AS c ON s.class_id = c.id WHERE c.id IS NULL` |
 | 전체 행 수 | `COUNT(*)` | `SELECT COUNT(*) AS student_count FROM students;` |
-| 값이 있는 행 수 | `COUNT(열)` | `COUNT(class_id) AS assigned_students` |
+| 값이 있는 행 수 | `COUNT(열)` | `COUNT(class_id) AS 반배정된학생수` |
 | 그룹별 개수 | `GROUP BY` + `COUNT` | `SELECT class_id, COUNT(*) … GROUP BY class_id` |
+| 그룹에 조건 걸기 | `HAVING` | `… GROUP BY c.id HAVING COUNT(s.id) < 5` |
 | 빈 그룹도 0으로 | 기준 테이블 `LEFT JOIN` + `COUNT(상대.id)` | `FROM classes AS c LEFT JOIN students AS s ON c.id = s.class_id GROUP BY c.id, c.name` + `COUNT(s.id)` |
 
 ## 확인 문제
@@ -561,6 +670,16 @@ ORDER BY id ASC;
 <details><summary>Q. `classes INNER JOIN students` 결과에 A반 이름이 세 번 나온다. 오류인가?</summary>
 
 정상이다. 일대다 관계에서 **학생마다 한 행**을 반환하므로 A반 학생이 세 명이면 A반 이름도 세 번 나온다. 반마다 한 행으로 보고 싶으면 `GROUP BY`로 집계한다.
+</details>
+
+<details><summary>Q. (수업 추가 SQL) `select email, registered_date, name from students inner join classes on …`은 왜 오류인가? 어떻게 고치는가?</summary>
+
+`students`와 `classes` 둘 다 `name` 열이 있어서 어느 쪽인지 모른다 → `ERROR 1052 (23000): Column 'name' in field list is ambiguous`. `students.name`, `classes.name`(또는 별칭 `s.name`, `c.name`)처럼 테이블을 붙이고, 결과에서 구분하려면 `s.name AS 학생이름`, `c.name AS 반이름`처럼 열 별칭도 붙인다.
+</details>
+
+<details><summary>Q. (수업 추가 SQL) `HAVING`은 무엇이고 `WHERE`와 어떻게 다른가? `having count(s.id) < 5`의 결과는?</summary>
+
+`HAVING`은 `GROUP BY`로 묶은 뒤의 그룹에 조건을 건다 (`WHERE`는 묶기 전 행을 거른다). 강의 데이터는 A반 3·B반 1·C반 0명이라 세 반 모두 5명보다 적어서 세 줄이 다 나온다. `< 2`로 바꾸면 B반·C반만 나온다.
 </details>
 
 ## 완료 체크
